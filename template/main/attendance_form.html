@@ -1,5 +1,6 @@
 {% extends 'main/base.html' %}
 {% load bootstrap4 %}
+{% load main_filters %}
 
 {% block title_block %}
 	<title>Add Attendance</title>
@@ -12,7 +13,7 @@
 		body{
 			/*color: grey;*/
 		}
-		.present{
+		.present_button{
 			margin-top: 5px;
 			width: 100%!important;
 
@@ -33,7 +34,7 @@
 
 		}
 
-		.absent{
+		.absent_button{
 			margin-top: 5px;
 			width: 100%!important;
 
@@ -63,6 +64,18 @@
 			margin-bottom: 10px;
 			border: black 0.5px solid!important;
 		}
+		.present{
+			background-color: #bff3c8;
+		}
+		.absent{
+			background-color: #e8aaaa;
+		}
+		.change{
+			display: inline-block; border: 1px solid black;
+		}
+		.change:hover{
+			cursor: pointer;
+		}
 	</style>
 
 	<h4 style="text-align: center;">Mark Attendance</h4>
@@ -70,30 +83,47 @@
 	<!-- <br> -->
 	<!-- <label for="date">Select Date: </label><input type="date" name="date" value="01-01-1970"> -->
 
+
 	<div id="mark_attendance">
 		<p style="text-align: center;">{{ date }}</p>
 		<p style="text-align: center;">Class: {{ grade }}</p>
-		{% for student in students %}
-		<div id="jumbotron_{{ student.pk }}" class="myCard">
-			<h5 class="studentName" style="text-align: center;">{{ student.name }}</h5>
-			<button id="present_{{student.pk}}" onclick="present('{{ student.name }}', '{{ student.pk }}')" class="col-12 present">
-				Present
-			</button>
 
-			<button id="present_{{student.pk}}" onclick="absent('{{ student.name }}', '{{ student.pk }}')" class="col-12 absent">
-				Absent
-			</button>
-		</div>
+		{% for student in students %}
+			{% if attendanceValues|get_item:student.pk == -1 %}
+			<div id="jumbotron_{{ student.pk }}" class="myCard">
+				<h5 class="studentName" style="text-align: center;">{{ student.name }}</h5>
+				<button id="present_{{student.pk}}" onclick="present('{{ student.name }}', '{{ student.pk }}', false)" class="col-12 present_button">
+					Present
+				</button>
+
+				<button id="present_{{student.pk}}" onclick="absent('{{ student.name }}', '{{ student.pk }}', false)" class="col-12 absent_button">
+					Absent
+				</button>
+			</div>
+			{% elif attendanceValues|get_item:student.pk == 1 %}
+			<div id="jumbotron_{{ student.pk }}" class="myCard present">
+				<div style="display: inline-block;" >{{ student.name }} was present.</div>
+				<div class="change" onclick="absent('{{ student.name }}', '{{ student.pk }}', true)">Change</div>
+			</div>
+			{% elif attendanceValues|get_item:student.pk == 0 %}
+			<div id="jumbotron_{{ student.pk }}" class="myCard absent">
+				<div style="display: inline-block;">{{ student.name }} was absent.</div>
+				<div class="change" onclick="present('{{ student.name }}', '{{ student.pk }}', true)">Change</div>
+			</div>
+			{% endif %}
+
 		{% empty %}
 			<h4 class="jumbotron" style="text-align: center;">No class {{ grade }} students yet :(</h4>
 		{% endfor %}
+
 	</div>
+
 	<script type="text/javascript">
 		var wl = window.location;
 		var url = wl.protocol + "//" + wl.hostname + ":" + wl.port + "/attendance/mark/";
 		console.log(url);
 
-		function present(name, pk){
+		function present(name, pk, usingChange){
 			pk = parseInt(pk)
 			$.ajax({
 				url: url,
@@ -101,7 +131,13 @@
 				dataType: "json",
 				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
 				success: function (data){
-					$("#jumbotron_"+pk).html(name + " marked present.");
+					if (usingChange) {
+						$("#jumbotron_"+pk).html(name + " marked present.<em>(Changed Once)</em>");
+					}
+					else{
+						$("#jumbotron_"+pk).html(name + " marked present.");
+					}
+
 					$("#jumbotron_"+pk).css('background-color', '#bff3c8');
 					// setTimeout(function(){
 					// 	$("#jumbotron_"+pk).hide();
@@ -110,15 +146,20 @@
 			});
 			$("#jumbotron_"+pk).html("Waiting");
 		}
-		function absent(name, pk) {
+		function absent(name, pk, usingChange) {
 			pk = parseInt(pk)
 			$.ajax({
 				url: url,
 				method: "GET",
 				dataType: "json",
-				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
+				data: "pk=" + pk + "&value=0&date={{date|date:'d-m-Y'}}",
 				success: function (data){
-					$("#jumbotron_"+pk).html(name + " marked absent.");
+					if (usingChange) {
+						$("#jumbotron_"+pk).html(name + " marked absent.<em>(Changed Once)</em>");
+					}
+					else{
+						$("#jumbotron_"+pk).html(name + " marked absent.");
+					}
 					$("#jumbotron_"+pk).css('background-color', '#e8aaaa');
 					// setTimeout(function(){
 					// 	$("#jumbotron_"+pk).hide();

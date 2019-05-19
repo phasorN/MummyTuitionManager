@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy, reverse
 from main.forms import StudentCreationForm
-from main.models import Student
+from main.models import Student, Attendance, Fee
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
@@ -57,8 +57,33 @@ def AttendanceCreateView(request):
 		date = request.GET.get('date')
 		date = dt.datetime.strptime(date, '%Y-%m-%d').date()
 
+		if date > dt.datetime.now().date():
+			date = dt.datetime.now().date()
+			date = date.strftime('%Y-%m-%d')
+
+			context = {'date':date, 'error': 'Adding future attendences is not allowed.'}
+			return render(request, "main/date_class_form.html", context)
+
 		students = Student.objects.filter(tutor=request.user, grade=grade)
-		return render(request, "main/attendance_form.html", {'students':students, 'date': date, 'grade': grade})
+
+		#########################################
+		# Attendance models are created here.
+		# (For this particular date)
+		#########################################
+
+		attendanceValues = {}
+
+		for student in students:
+			if Attendance.objects.filter(student=student, tutor=request.user, date=date).exists():
+				# if attendence exists, get the value.
+				a=Attendance.objects.get(student=student, tutor=request.user, date=date)
+				attendanceValues.update({student.pk: a.value})
+			else:
+				Attendance.objects.create(student=student, tutor=request.user, date=date, value=-1)
+				a=Attendance.objects.get(student=student, tutor=request.user, date=date)
+				attendanceValues.update({student.pk: a.value})
+
+		return render(request, "main/attendance_form.html", {'students':students, 'date': date, 'grade': grade, 'attendanceValues': attendanceValues})
 
 	date = dt.datetime.now().date()
 	date = date.strftime('%Y-%m-%d')
@@ -69,7 +94,14 @@ def AttendanceCreateView(request):
 def AttendanceMarkView(request):
 	date = request.GET.get('date')
 	pk = request.GET.get('pk')
-	print(pk + ' ' + date)
+	value = request.GET.get('value')
 
+	date = dt.datetime.strptime(date, '%d-%m-%Y')
+
+	student = Student.objects.get(pk=pk)
+	a = Attendance.objects.get(student=student, tutor=request.user, date=date)
+
+	a.value = int(value)
+	a.save()
 
 	return JsonResponse({'code': 200})

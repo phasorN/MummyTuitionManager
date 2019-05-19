@@ -17,6 +17,9 @@ class Attendance(models.Model):
 	date = models.DateField()
 	value = models.IntegerField()
 
+	def __str__(self):
+		return str(self.student.name) + ":class:" + str(self.student.grade) + ":date:" + str(self.date)
+
 class Fee(models.Model):
 	tutor = models.ForeignKey(User, on_delete = models.CASCADE, null = False)
 	student = models.ForeignKey(Student, on_delete = models.CASCADE, null = False)

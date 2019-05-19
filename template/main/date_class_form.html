@@ -12,10 +12,17 @@
 			font-size: 20px;
 			padding-left: 0px!important;
 		}
-		#class9{}
+		.classButton{
+			outline: 0px!important;
+		}
 	</style>
 	<h4>Select Date and Class:</h4>
+
+	{% if error %}
+	<small style="color: red">{{ error }}</small>
+	{% else %}
 	<br>
+	{% endif %}
 	<form class="container">
 		<div class="form-group row">
 			<label class="col-2 form-label mx-auto" for="date">Date:</label> 
@@ -24,8 +31,8 @@
 
 		<div class="form-group row">
 			<label class="col-2 form-label mx-auto" for="class">Class:</label> 
-			<input id="class9" class="col-5 form-control" type="button" value="9" onclick="changeBack(this)">
-			<input id="class10" class="col-5 form-control" type="button" value="10" onclick="changeBack(this)">
+			<input id="class9" class="col-5 form-control classButton" type="button" value="9" onclick="changeBack(this)">
+			<input id="class10" class="col-5 form-control classButton" type="button" value="10" onclick="changeBack(this)">
 
 			<input id="classInput" type="hidden" name="class" value="9">
 		</div>
