@@ -2,3 +2,4 @@
 **/migrations
 # manage.py
 # **/wsgi.py
+db.sqlite3

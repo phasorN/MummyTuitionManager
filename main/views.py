@@ -37,6 +37,9 @@ class StudentListView(LoginRequiredMixin, ListView):
 	model = Student
 	template_name = "main/student_list.html"
 
+	def get_queryset(self):
+		return Student.objects.filter(tutor=self.request.user).order_by('grade')
+
 
 class StudentDetailView(LoginRequiredMixin, DetailView):
 	model = Student
@@ -67,6 +70,6 @@ def AttendanceMarkView(request):
 	date = request.GET.get('date')
 	pk = request.GET.get('pk')
 	print(pk + ' ' + date)
-	
+
 
 	return JsonResponse({'code': 200})
