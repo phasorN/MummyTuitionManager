@@ -67,5 +67,6 @@ def AttendanceMarkView(request):
 	date = request.GET.get('date')
 	pk = request.GET.get('pk')
 	print(pk + ' ' + date)
+	
 
 	return JsonResponse({'code': 200})

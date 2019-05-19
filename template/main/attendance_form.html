@@ -84,13 +84,19 @@
 				Absent
 			</button>
 		</div>
+		{% empty %}
+			<h4 class="jumbotron" style="text-align: center;">No class {{ grade }} students yet :(</h4>
 		{% endfor %}
 	</div>
 	<script type="text/javascript">
+		var wl = window.location;
+		var url = wl.protocol + "//" + wl.hostname + ":" + wl.port + "/attendance/mark/";
+		console.log(url);
+
 		function present(name, pk){
 			pk = parseInt(pk)
 			$.ajax({
-				url:"http://192.168.1.104:8000/attendance/mark/",
+				url: url,
 				method: "GET",
 				dataType: "json",
 				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
@@ -107,7 +113,7 @@
 		function absent(name, pk) {
 			pk = parseInt(pk)
 			$.ajax({
-				url:"http://192.168.1.104:8000/attendance/mark/",
+				url: url,
 				method: "GET",
 				dataType: "json",
 				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
