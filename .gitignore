@@ -1,0 +1,4 @@
+*.pyc
+**/migrations
+# manage.py
+# **/wsgi.py

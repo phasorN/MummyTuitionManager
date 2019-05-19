@@ -1,0 +1,125 @@
+{% extends 'main/base.html' %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+	<title>Add Attendance</title>
+{% endblock %}
+
+{% block body_block %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<style type="text/css">
+		body{
+			/*color: grey;*/
+		}
+		.present{
+			margin-top: 5px;
+			width: 100%!important;
+
+			background-color: #115011;
+			color: white;
+			
+			/*border-color: #115011;*/
+			/*color: #115011;*/
+			
+			text-align: center;
+			/*padding: 10%;*/
+			height: 100px;
+			border-radius: 10px;
+			/*background-color: black;*/
+			outline: none!important;
+			/*border: green 1px solid;*/
+			font-size: 24px;
+
+		}
+
+		.absent{
+			margin-top: 5px;
+			width: 100%!important;
+
+			background-color: #ad0b0b;
+			color: white;
+			
+			/*border-color: #ad0b0b;*/
+			/*color: #ad0b0b;*/
+			
+			text-align: center;
+			/*padding: 10%;*/
+			height: 100px;
+			border-radius: 10px;
+			/*background-color: black;*/
+			/*border: red 1px solid;*/
+			font-size: 24px;
+
+		}
+		.studentName{
+			font-size: 30px;
+		}
+		.myCard{
+			background-color: #bfbfbf;
+			border: none!important;
+			padding: 30px;
+			border-radius: 10px;
+			margin-bottom: 10px;
+			border: black 0.5px solid!important;
+		}
+	</style>
+
+	<h4 style="text-align: center;">Mark Attendance</h4>
+	<!-- <h4 style="text-align: center; color: white;">Mark Attendance</h4> -->
+	<!-- <br> -->
+	<!-- <label for="date">Select Date: </label><input type="date" name="date" value="01-01-1970"> -->
+
+	<div id="mark_attendance">
+		<p style="text-align: center;">{{ date }}</p>
+		<p style="text-align: center;">Class: {{ grade }}</p>
+		{% for student in students %}
+		<div id="jumbotron_{{ student.pk }}" class="myCard">
+			<h5 class="studentName" style="text-align: center;">{{ student.name }}</h5>
+			<button id="present_{{student.pk}}" onclick="present('{{ student.name }}', '{{ student.pk }}')" class="col-12 present">
+				Present
+			</button>
+
+			<button id="present_{{student.pk}}" onclick="absent('{{ student.name }}', '{{ student.pk }}')" class="col-12 absent">
+				Absent
+			</button>
+		</div>
+		{% endfor %}
+	</div>
+	<script type="text/javascript">
+		function present(name, pk){
+			pk = parseInt(pk)
+			$.ajax({
+				url:"http://192.168.1.104:8000/attendance/mark/",
+				method: "GET",
+				dataType: "json",
+				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
+				success: function (data){
+					$("#jumbotron_"+pk).html(name + " marked present.");
+					$("#jumbotron_"+pk).css('background-color', '#bff3c8');
+					// setTimeout(function(){
+					// 	$("#jumbotron_"+pk).hide();
+					// }, 1500);
+				}
+			});
+			$("#jumbotron_"+pk).html("Waiting");
+		}
+		function absent(name, pk) {
+			pk = parseInt(pk)
+			$.ajax({
+				url:"http://192.168.1.104:8000/attendance/mark/",
+				method: "GET",
+				dataType: "json",
+				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
+				success: function (data){
+					$("#jumbotron_"+pk).html(name + " marked absent.");
+					$("#jumbotron_"+pk).css('background-color', '#e8aaaa');
+					// setTimeout(function(){
+					// 	$("#jumbotron_"+pk).hide();
+					// }, 1500);
+				}
+			});
+			$("#jumbotron_"+pk).html("Waiting");
+		}
+	</script>
+{% endblock %}

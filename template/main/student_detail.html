@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+	<title>Student Detail</title>
+{% endblock %}
+
+{% block body_block %}
+	<h5>Student Details</h5>
+	<p>	Name: {{ student.name }} </p>
+	<p>	Class: {{ student.grade }} </p>
+
+{% endblock %}

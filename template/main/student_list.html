@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+	<title>Student List</title>
+{% endblock %}
+
+{% block body_block %}
+	<h4>Students: </h4>
+	{% regroup student_list by grade as Rstudent_list %}
+	{% for grade, students in Rstudent_list %}
+		<h5>Class: {{ grade }}</h5>
+	<ol>
+		{% for student in students %}
+			<li><a href="{% url 'main:student_detail' pk=student.pk %}">{{ student.name }}</a></li>
+		{% endfor %}
+	</ol>
+	{% empty %}
+		<h5>No Students Yet! :(</h5>
+	{% endfor %}
+{% endblock %}
