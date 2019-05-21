@@ -61,7 +61,7 @@ def AttendanceCreateView(request):
 			date = dt.datetime.now().date()
 			date = date.strftime('%Y-%m-%d')
 
-			context = {'date':date, 'error': 'Adding future attendences is not allowed.'}
+			context = {'date':date, 'error': 'Adding future attendances is not allowed.'}
 			return render(request, "main/date_class_form.html", context)
 
 		students = Student.objects.filter(tutor=request.user, grade=grade)
@@ -83,7 +83,7 @@ def AttendanceCreateView(request):
 				a=Attendance.objects.get(student=student, tutor=request.user, date=date)
 				attendanceValues.update({student.pk: a.value})
 
-		return render(request, "main/attendance_form.html", {'students':students, 'date': date, 'grade': grade, 'attendanceValues': attendanceValues})
+		return render(request, "main/attendance_form.html", {'students':students, 'date': date, 'grade': grade, 'attVal': attendanceValues})
 
 	date = dt.datetime.now().date()
 	date = date.strftime('%Y-%m-%d')
@@ -105,3 +105,27 @@ def AttendanceMarkView(request):
 	a.save()
 
 	return JsonResponse({'code': 200})
+
+@login_required
+def AttendanceChangeView(request):
+	date = request.GET.get('date')
+	pk = request.GET.get('pk')
+	date = dt.datetime.strptime(date, '%d-%m-%Y')
+
+	student = Student.objects.get(pk=pk)
+	a = Attendance.objects.get(student=student, tutor=request.user, date=date)
+
+	current_value = a.value
+	# print(current_value)
+
+	if current_value == 0:
+		a.value = 1
+		a.save()
+		return JsonResponse({'code': 200, 'changedTo': 1})
+	elif current_value ==1:
+		a.value = 0
+		a.save()
+		return JsonResponse({'code': 200, 'changedTo': 0})
+	else:
+		return JsonResponse({'code': 400})
+		

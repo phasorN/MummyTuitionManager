@@ -1,0 +1,186 @@
+{% extends 'main/base.html' %}
+{% load bootstrap4 %}
+{% load main_filters %}
+
+{% block title_block %}
+	<title>Add Attendance</title>
+{% endblock %}
+
+{% block body_block %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<style type="text/css">
+		body{
+			/*color: grey;*/
+		}
+		.present_button{
+			margin-top: 5px;
+			width: 100%!important;
+
+			background-color: #115011;
+			color: white;
+			
+			/*border-color: #115011;*/
+			/*color: #115011;*/
+			
+			text-align: center;
+			/*padding: 10%;*/
+			height: 100px;
+			border-radius: 10px;
+			/*background-color: black;*/
+			outline: none!important;
+			/*border: green 1px solid;*/
+			font-size: 24px;
+
+		}
+
+		.absent_button{
+			margin-top: 5px;
+			width: 100%!important;
+
+			background-color: #ad0b0b;
+			color: white;
+			
+			/*border-color: #ad0b0b;*/
+			/*color: #ad0b0b;*/
+			
+			text-align: center;
+			/*padding: 10%;*/
+			height: 100px;
+			border-radius: 10px;
+			/*background-color: black;*/
+			/*border: red 1px solid;*/
+			font-size: 24px;
+
+		}
+		.name{
+			font-size: 30px;
+		}
+		.myCard{
+			background-color: #bfbfbf;
+			border: none!important;
+			padding: 30px;
+			border-radius: 10px;
+			margin-bottom: 10px;
+			border: black 0.5px solid!important;
+		}
+		.present{
+			background-color: #bff3c8;
+		}
+		.absent{
+			background-color: #e8aaaa;
+		}
+		.change{
+			display: inline-block; border: 1px solid black;
+		}
+		.change:hover{
+			cursor: pointer;
+		}
+		.changeFirstTime{
+			display: inline-block; border: 1px solid black;
+			display: none;
+		}
+		.changeFirstTime:hover{
+			cursor: pointer;
+		}
+		.nameSpan{
+			display: none;
+		}
+	</style>
+
+	<h4 style="text-align: center;">Mark Attendance</h4>
+
+	<div id="mark_attendance">
+		<p style="text-align: center;">{{ date }}</p>
+		<p style="text-align: center;">Class: {{ grade }}</p>
+
+		{% for student in students %}
+			{% if attVal|get_item:student.pk == -1 %}
+			<div id="jumbotron_{{ student.pk }}" class="myCard">
+				<h5 id="name_h_{{ student.pk }}" class="name" style="text-align: center;">{{ student.name }}</h5>
+				<span id="after_mark_{{ student.pk }}"></span>
+				<button id="present_{{student.pk}}" onclick="present('{{ student.name }}', '{{ student.pk }}', false)" class="col-12 present_button">
+					Present
+				</button>
+
+				<button id="absent_{{student.pk}}" onclick="absent('{{ student.name }}', '{{ student.pk }}', false)" class="col-12 absent_button">
+					Absent
+				</button>
+				<div id="change_present_{{student.pk}}" class="changeFirstTime" onclick="absent('{{ student.name }}', '{{ student.pk }}', true)">Change</div>
+				<div id="change_absent_{{student.pk}}" class="changeFirstTime" onclick="present('{{ student.name }}', '{{ student.pk }}', true)">Change</div>
+			</div>
+			{% elif attVal|get_item:student.pk == 1 %}
+			<div id="jumbotron_{{ student.pk }}" class="myCard present">
+				<div style="display: inline-block;" >{{ student.name }} was present.</div>
+				<div class="change" onclick="absent('{{ student.name }}', '{{ student.pk }}', true)">Change</div>
+			</div>
+			{% elif attVal|get_item:student.pk == 0 %}
+			<div id="jumbotron_{{ student.pk }}" class="myCard absent">
+				<div style="display: inline-block;">{{ student.name }} was absent.</div>
+				<div class="change" onclick="present('{{ student.name }}', '{{ student.pk }}', true)">Change</div>
+			</div>
+			{% endif %}
+
+		{% empty %}
+			<h4 class="jumbotron" style="text-align: center;">No class {{ grade }} students yet :(</h4>
+		{% endfor %}
+
+	</div>
+
+	<script type="text/javascript">
+		var wl = window.location;
+		var url = wl.protocol + "//" + wl.hostname + ":" + wl.port + "/attendance/mark/";
+		console.log(url);
+
+		function present(name, pk, usingChange){
+			pk = parseInt(pk)
+			$.ajax({
+				url: url,
+				method: "GET",
+				dataType: "json",
+				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
+				success: function (data){
+					if (usingChange) {
+						$("#after_mark_"+pk).text("asdasd")
+					}
+					else{
+						$("#after_mark_"+pk).text(name + " marked present.")
+						
+						document.getElementById('change_present_' + pk).style.display = "inline-block";
+					}
+
+					$("#jumbotron_"+pk).css('background-color', '#bff3c8');
+					// setTimeout(function(){
+					// 	$("#jumbotron_"+pk).hide();
+					// }, 1500);
+				}
+			});
+			$("#present_"+pk).hide();
+			$("#absent_"+pk).hide();
+			$("#name_h_"+pk).toggle();
+
+		}
+		function absent(name, pk, usingChange) {
+			pk = parseInt(pk)
+			$.ajax({
+				url: url,
+				method: "GET",
+				dataType: "json",
+				data: "pk=" + pk + "&value=0&date={{date|date:'d-m-Y'}}",
+				success: function (data){
+					if (usingChange) {
+						$("#jumbotron_"+pk).html(name + " marked absent.<em>(Changed Once)</em>");
+					}
+					else{
+						$("#jumbotron_"+pk).html(name + " marked absent.");
+					}
+					$("#jumbotron_"+pk).css('background-color', '#e8aaaa');
+					// setTimeout(function(){
+					// 	$("#jumbotron_"+pk).hide();
+					// }, 1500);
+				}
+			});
+			$("#jumbotron_"+pk).html("Waiting");
+		}
+	</script>
+{% endblock %}
