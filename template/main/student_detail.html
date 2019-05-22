@@ -6,8 +6,57 @@
 {% endblock %}
 
 {% block body_block %}
+	<style type="text/css">
+		table, tbody, tr, td{
+			padding: 5px;
+			border: 1px solid black;
+		}
+		table{
+			width: 100%;
+		}
+		.td1{
+			border-right: none!important;
+		}
+		.td2{
+			text-align: right;
+			border: none!important;
+		}
+		.present{
+			background-color: #bff3c8;
+		}
+		.absent{	
+			background-color: #e8aaaa;
+		}
+		.notMarked{	
+			background-color: #ecec52;
+		}
+	</style>
 	<h5>Student Details</h5>
-	<p>	Name: {{ student.name }} </p>
-	<p>	Class: {{ student.grade }} </p>
+	<table>
+		<tr><td class="td1">Name </td><td class="td2">{{ student.name }} </td></tr>
+		<tr><td class="td1">Class </td><td class="td2">{{ student.grade }} </td></tr>
+		<tr><td class="td1">Joined On </td><td class="td2">{{ student.date_joined }} </td></tr>
+	</table>
+	<br>
+
+	<h5>Attendance</h5>
+	<table>
+	{% for x in studentAttendance %}
+		{% if x.value == 0 %}
+			<tr class="absent"><td class="td1">{{ x.date }}</td><td class="td2" style="float: right!important;">Absent</td></tr>
+		{% elif x.value == 1 %}
+			<tr class="present"><td class="td1">{{ x.date }}</td><td class="td2" style="float: right!important;">Present</td></tr>
+		{% elif x.value == -1 %}
+			<tr class="notMarked"><td class="td1">{{ x.date }}</td><td class="td2" style="float: right!important;">Not Marked</td></tr>
+		{% endif %}
+	{% empty %}
+		<table>
+			<tr><td style="padding: 40px;"><h6 style="text-align: center;">No data yet :(</h6></td></tr>
+		</table>
+		
+	{% endfor %}
+	</table>
+	<br>
+	<br>
 
 {% endblock %}

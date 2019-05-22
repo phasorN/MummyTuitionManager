@@ -27,7 +27,7 @@ def userLogin(request):
 					login(request, user)
 					return HttpResponseRedirect(next)
 				else:
-					return HttpResponseRedirect(reverse('accounts:login'))
+					return render(request, 'accounts/userLogin.html', {'errors': 'Invalid username or password'})
 			else:
 				return HttpResponseRedirect(reverse('accounts:login'))
 		else:

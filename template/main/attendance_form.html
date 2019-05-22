@@ -14,6 +14,7 @@
 			text-align: center;
 		}
 		.attendanceCard{
+			margin:0 auto; 
 			margin-bottom: 10px;
 			/*border: 1px solid black;*/
 			padding: 20px;
@@ -44,13 +45,26 @@
 		.absent{
 			background-color: red;
 		}
+		a{
+			margin-left: 5px;
+			margin-right: 5px;
+			color: grey;
+		}
 	</style>
 
 	<div>
-		<h4 class="centre">Attendance</h4>
-		<h5 class="centre">Class: {{ grade }} | {{ date }}</h5>
+		<h4 class="centre">Attendance | Class: {{ grade }}</h4>
+		{% if not number_of_unmarked == 0%}
+		<h5 style="color: red" class="centre">{{ number_of_unmarked }} Unmarked</h5>
+		{% endif %}
+		<center>
+			<a href="?date={{ date_minus|date:'Y-m-d' }}&class={{ grade }}">Prev</a>
+			<h5 style="display: inline-block;"> {{ date }}</h5>
+			<a href="?date={{ date_plus|date:'Y-m-d' }}&class={{ grade }}">Next</a>
+		</center>
+
 		{% for s in students %}
-			<div class="attendanceCard" id="attendanceCard_{{s.pk}}" style="
+			<div class="attendanceCard col-md-6 col-lg-6" id="attendanceCard_{{s.pk}}" style="
 			background-color: 
 			{% if attVal|get_item:s.pk == 1 %}
 				#bff3c8;
@@ -120,6 +134,8 @@
 				{% endif %}
 			</div>
 		{% endfor %}
+		<br>
+		<br>
 	</div>
 
 	<script type="text/javascript">

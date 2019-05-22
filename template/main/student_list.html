@@ -6,16 +6,66 @@
 {% endblock %}
 
 {% block body_block %}
+<style type="text/css">
+	*{
+		color: black;
+		/*border:1px solid black;*/
+	}
+	.my_card_container{
+		padding: 10px;
+	}
+	.my_card{
+		border:1px solid black;
+		display: inline-block!important;
+		padding: 10px;
+		padding-top: 14px;
+		border-radius: 5px;
+		width: 100%;
+	}
+	.my_card:hover{
+		color: white;
+		background-color: #2e3038;
+	}
+	.my_card_left{
+		border:1px solid grey;
+		display: inline-
+		padding: 10px;
+		padding-top: 14px;
+		border-radius: 5px;
+		width: 100%;
+		color: grey;
+	}
+	@media only screen and (max-width: 600px) {
+		.my_card_container{
+			width: 50%;
+		}
+	}
+</style>
 	<h4>Students: </h4>
 	{% regroup student_list by grade as Rstudent_list %}
 	{% for grade, students in Rstudent_list %}
-		<h5>Class: {{ grade }}</h5>
-	<ol>
-		{% for student in students %}
-			<li><a href="{% url 'main:student_detail' pk=student.pk %}">{{ student.name }}</a></li>
+		<h5 style="margin-top: 10px;">Class: {{ grade }}</h5>
+		<div class="row" style="padding: 0!important;">
+			{% for student in students %}
+			{% if student.left %}
+			<div class="my_card_container col-md-3 col-sm-4">
+				<button class="my_card_left btn" disabled="true">
+					<h5 style="text-align: center;">{{ student.name }}</h5>
+				</button>
+			</div>
+			{% else %}
+			<div class="my_card_container col-md-3 col-sm-4">
+				<a href="{% url 'main:student_detail' pk=student.pk %}">
+					<div class="my_card btn">
+						<h5 style="text-align: center;">{{ student.name }}</h5>
+					</div>
+				</a>
+			</div>
+			{% endif %}
 		{% endfor %}
-	</ol>
+		</div>
 	{% empty %}
 		<h5>No Students Yet! :(</h5>
 	{% endfor %}
+		<br>
 {% endblock %}

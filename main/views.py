@@ -9,10 +9,32 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 import datetime as dt
+from datetime import timedelta
 
 # Create your views here.
 def Index(request):
-	return render(request, "main/index.html", {})
+	if not request.user.is_authenticated:
+		return render(request, "main/index.html",{})
+
+	# else:
+	# students = Student.objects.filter(tutor=request.user, left=False)
+	# grade_dict = students.values('grade').distinct()
+	# grade_list = []
+	# for x in grade_dict:
+	# 	grade_list.append(x['grade'])
+
+	# number_stud_grade = {}
+
+	# for grade in grade_list:
+	# 	number_of_students = Student.objects.filter(tutor=request.user, grade=int(grade), left=False).count()
+	# 	number_stud_grade.update({
+	# 			grade: number_of_students
+	# 		})
+
+	today = dt.datetime.now().date().strftime('%Y-%m-%d')
+
+	return render(request, "main/index.html", {'date_today': today})
+
 
 class StudentCreateView(LoginRequiredMixin, CreateView):
 	model = Student
@@ -40,10 +62,18 @@ class StudentListView(LoginRequiredMixin, ListView):
 	def get_queryset(self):
 		return Student.objects.filter(tutor=self.request.user).order_by('grade')
 
-
 class StudentDetailView(LoginRequiredMixin, DetailView):
 	model = Student
 	template_name = "main/student_detail.html"
+
+	def get_context_data(self, ** kwargs):
+		context = super().get_context_data( ** kwargs)
+		pk=self.kwargs.get('pk')
+		student = Student.objects.get(pk=pk)
+		studentAttendance = Attendance.objects.filter(student=student).order_by('-date')
+		# print(studentAttendance)
+		context.update({'studentAttendance': studentAttendance})
+		return context
 
 @login_required
 def AttendanceCreateView(request):
@@ -64,7 +94,7 @@ def AttendanceCreateView(request):
 			context = {'date':date, 'error': 'Adding future attendances is not allowed.'}
 			return render(request, "main/date_class_form.html", context)
 
-		students = Student.objects.filter(tutor=request.user, grade=grade)
+		students = Student.objects.filter(tutor=request.user, grade=grade, left=False)
 
 		#########################################
 		# Attendance models are created here.
@@ -82,8 +112,19 @@ def AttendanceCreateView(request):
 				Attendance.objects.create(student=student, tutor=request.user, date=date, value=-1)
 				a=Attendance.objects.get(student=student, tutor=request.user, date=date)
 				attendanceValues.update({student.pk: a.value})
+		
+		date_minus = date - timedelta(1)
+		date_plus = date + timedelta(1)
+		# print(date_minus)
+		# print(date_plus)
+		
+		number_of_unmarked = 0
 
-		return render(request, "main/attendance_form.html", {'students':students, 'date': date, 'grade': grade, 'attVal': attendanceValues})
+		for a in attendanceValues:
+			if attendanceValues[a] == -1:
+				number_of_unmarked = number_of_unmarked + 1
+
+		return render(request, "main/attendance_form.html", {'students':students, 'date': date, 'grade': grade, 'attVal': attendanceValues, 'date_minus': date_minus, 'date_plus': date_plus, 'number_of_unmarked': number_of_unmarked})
 
 	date = dt.datetime.now().date()
 	date = date.strftime('%Y-%m-%d')
@@ -129,3 +170,8 @@ def AttendanceChangeView(request):
 	else:
 		return JsonResponse({'code': 400})
 		
+@login_required
+def FeeCreateView(request):
+	students_class_9 = Student.objects.filter(grade=9)
+	students_class_10 = Student.objects.filter(grade=10)
+	return render(request, "main/fee_form.html", {'students_class_9':students_class_9, 'students_class_10':students_class_10})

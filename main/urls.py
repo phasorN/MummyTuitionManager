@@ -14,4 +14,6 @@ urlpatterns = [
     path('attendance/new/', views.AttendanceCreateView, name = 'attendance_form'),
     path('attendance/mark/', views.AttendanceMarkView, name = 'mark_attendance'),
     path('attendance/change/', views.AttendanceChangeView, name = 'change_attendance'),
+
+    path('fee/new/', views.FeeCreateView, name='fee_form')
 ]

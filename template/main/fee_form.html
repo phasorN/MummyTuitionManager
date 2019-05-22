@@ -1,0 +1,127 @@
+{% extends 'main/base.html' %}
+{% load main_filters %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+	<title>Add Fee</title>
+{% endblock %}
+
+{% block body_block %}
+<style type="text/css">
+	.my_card_container{
+		padding: 10px;
+		width: 50%;
+	}
+	.my_card{
+		background-color: transparent;
+		border:1px solid black;
+		display: inline-block!important;
+		padding: 10px;
+		border-radius: 5px;
+		width: 100%;
+	}
+	.my_card:hover{
+		color: white;
+		background-color: #2e3038;
+	}
+	.my_card:focus{
+		color: white;
+		background-color: #2e3038;
+	}
+	#main_container{
+		border-top: 1px solid black;
+		/*height: 70vh;*/
+	}
+	.row{
+		margin: 0px!important;
+	}
+</style>
+<h4 style="display: block; text-align: center;">Add Fee Details</h4>
+
+<div id="main_container">
+<br>
+	<h5 style="display: block; text-align: center;">Select Class</h5>
+	<div class="row" style="padding: 0!important; margin: 0 auto!important;">
+		<div class="my_card_container">
+			<button class="my_card btn" id="class9" onclick="changeBack(this)" style="text-align: center;">Class 9</button>
+		</div>
+		<div class="my_card_container">
+			<button class="my_card btn" id="class10" onclick="changeBack(this)" style="text-align: center;">Class 10</button>
+		</div>
+	</div>
+	<hr>
+	<h5 style="margin-bottom: 20px; text-align: center;">Select Student</h5>
+	<div id="class_9_students" class="row">
+		{% for sc9 in students_class_9 %}
+			<div class="my_card_container">
+				<button class="my_card btn" onclick="student_selected('{{ sc9.pk }}')">{{ sc9.name }}</button>
+			</div>
+		{% endfor %}
+	</div>
+	<div id="class_10_students" class="row" style="display: none;">
+		{% for sc10 in students_class_10 %}
+			<div class="my_card_container">
+				<button class="my_card btn" onclick="student_selected('{{ sc10.pk }}')">{{ sc10.name }}</button>
+			</div>
+		{% endfor %}
+	</div>
+	<script type="text/javascript">
+		var url_string = window.location.href;
+		var url = new URL(url_string)
+		url_grade = url.searchParams.get('grade')
+		if(url_grade){
+			console.log(url_grade);
+			var grade = document.getElementById('class'+ url_grade);
+			var grade_students = document.getElementById('class_'+ url_grade + '_students');
+			// grade.style.backgroundColor = "black";
+			// grade.style.color = "white";
+			// grade_students.style.display = "flex";
+			var a = grade;
+			changeBack(a);
+		}
+		else{
+			var class9 = document.getElementById('class9');
+			class9.style.backgroundColor = "black";
+			class9.style.color = "white";
+		}
+
+		function changeBack(a) {
+			var class9 = document.getElementById('class9');
+			var class10 = document.getElementById('class10');
+			var class_9_students = document.getElementById('class_9_students');
+			var class_10_students = document.getElementById('class_10_students');
+
+			if(a.id == 'class9'){
+				if(class10.style.backgroundColor == "black"){
+					class10.style.backgroundColor = "white";
+					class10.style.color = "black";
+				}
+				class9.style.backgroundColor="black";
+				class9.style.color = "white";
+				class_9_students.style.display="flex";
+				class_10_students.style.display="none";
+
+
+			}
+			else if(a.id == 'class10'){
+				console.log(class9.style.backgroundColor)
+				if(class9.style.backgroundColor == "black"){
+					class9.style.backgroundColor = "white";
+					class9.style.color = "black";
+				}
+				class10.style.backgroundColor="black";
+				class10.style.color = "white";
+				class_10_students.style.display="flex";
+				class_9_students.style.display="none";
+			}
+		}
+
+		function student_selected(pk){
+			alert("INCOMPLETE\nstudent.pk: " + pk + "\nPopup a modal and then ask for amount and month. Forward the student pk with the month and amount.");
+
+		}
+	</script>
+	<br>
+</div>
+
+{% endblock %}

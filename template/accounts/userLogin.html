@@ -7,20 +7,57 @@
 
 {% block body_block %}
 
+	<style type="text/css">
+		#error{
+			color: #ad0330;
+		}
+		input{
+			outline: none;
+			border: none;
+			border: 1px solid grey;
+			/*border-radius: 5px;*/
+			padding-left: 10px;
+			/*border-bottom: 2px solid grey!important;*/
+			/*background-color: #e6dbc9!important;*/
+
+			width: 100%;
+			display: block;
+		}
+		input:focus{
+			border: 1px solid black;
+		}
+		.c1{
+			padding: 25px;
+			margin:0 auto!important; 
+			background-color: white!important;
+			border: 1px solid black;
+			border-radius: 8px;
+		}
+		h6{
+			color: black;
+		}
+	</style>
+
+
+<div class="container c1 col-md-6 col-lg-4" style="width: 90%!important; padding-top: 32px;">
 	<form method = "POST">
-		<label for="username">Username :</label>
-		<input type="text" name="username">
-
-		<br>
-		
-		<label for="password">Password :</label>
-		<input type="password" name="password">
-
+		{% if errors %}
+			<p id="error">{{errors}}</p>
+		{% endif %}
+		<h5>Login</h5>
+		<div>
+			<h6>Username</h6>
+			<input type="text" name="username" id="username">
+		</div>
+		<div style="margin-top: 20px;">
+			<h6>Password</h6>
+			<input type="password" name="password" id="password">
+		</div>
 		{% csrf_token %}
-
-		<br>
-		
-		<button type="submit">Login</button>
+		<div style="margin-top: 20px; margin-bottom: 0px;">
+			<button type="submit" style="color: white; background-color: black; margin: auto; width: 100%" class="btn btn-sm">Login</button>
+		</div>
 	</form>
+</div>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% load main_filters %}
 {% load bootstrap4 %}
 
 {% block title_block %}
@@ -6,5 +7,191 @@
 {% endblock %}
 
 {% block body_block %}
-	<h4>Tution Management</h4>
+	<style type="text/css">
+		.att{
+			color: black;
+		}
+		.jumbotron{
+			padding-top: 30px!important;
+			padding-bottom: 30px!important;
+		}
+		.custom_btn{
+			background-color: transparent;
+			outline: none;
+			border: 1px solid black;
+			border-radius: 10px;
+			padding: 10px;
+			width: 100%;
+			display: block;
+		}
+		.custom_btn:hover{
+			background-color: black;
+			outline: none;
+			border: 1px solid white;
+			color: white;
+			cursor: pointer;
+		}
+		.my_card_container{
+			padding: 10px;
+			width: 50%;
+		}
+		.my_card{
+			border:1px solid black;
+			display: inline-block!important;
+			padding: 5px;
+			padding-top: 10px;
+			border-radius: 5px;
+			width: 100%;
+		}
+		.my_card:hover{
+			color: white;
+			background-color: #2e3038;
+		}
+		@media only screen and (max-width: 600px) {
+			.my_card_container{
+				width: 50%;
+			}
+		}
+		.today_attendance{
+			border: 1px solid black;
+		}
+	</style>
+	{% if user.is_authenticated %}
+		<h4 style="text-align: center;">Tution Management</h4>
+		<br>
+		<button class="custom_btn" onclick="mark_attendance()">Mark Today's Attendance</button>
+		<br>
+		<button class="custom_btn" onclick="add_fee()">Add Fee Details</button>
+		<br>
+		<div class="today_attendance container" style="display: none;">
+			<br>
+			<h5 style="text-align: center;">Add Fee Details</h5>
+			<div class="row" style="padding: 0!important; margin: 0 auto!important;">
+				<div class="my_card_container">
+					<a class="att" href="/fee/new/?grade=9">
+						<div class="my_card btn">
+							<h5 style="text-align: center;">Class 9</h5>
+						</div>
+					</a>
+				</div>
+
+				<div class="my_card_container">
+					<a class="att" href="/fee/new/?grade=10">
+						<div class="my_card btn">
+							<h5 style="text-align: center;">Class 10</h5>
+						</div>
+					</a>
+				</div>
+			</div>
+			<br>
+
+		</div>
+
+		<div id="mymodal_custom_mark_att" class="modal_custom">
+			<div class="modal_custom-content">
+				<h5 style="text-align: center;">Mark Today's Attendance</h5>
+				<div class="row" style="padding: 0!important; margin: 0 auto!important;">
+					<div class="my_card_container">
+						<a class="att" href="/attendance/new/?date={{ date_today }}&class=9">
+							<div class="my_card btn">
+								<h5 style="text-align: center;">Class 9</h5>
+							</div>
+						</a>
+					</div>
+					<div class="my_card_container">
+						<a class="att" href="/attendance/new/?date={{ date_today }}&class=10">
+							<div class="my_card btn">
+								<h5 style="text-align: center;">Class 10</h5>
+							</div>
+						</a>
+					</div>
+				<br>
+				</div>
+			</div>
+		</div>
+		<div id="mymodal_custom_add_fee" class="modal_custom">
+			<div class="modal_custom-content">
+				<h5 style="text-align: center;">Add Fee Details</h5>
+				<div class="row" style="padding: 0!important; margin: 0 auto!important;">
+				<div class="my_card_container">
+					<a class="att" href="/fee/new/?grade=9">
+						<div class="my_card btn">
+							<h5 style="text-align: center;">Class 9</h5>
+						</div>
+					</a>
+				</div>
+
+				<div class="my_card_container">
+					<a class="att" href="/fee/new/?grade=10">
+						<div class="my_card btn">
+							<h5 style="text-align: center;">Class 10</h5>
+						</div>
+					</a>
+				</div>
+			</div>
+			</div>
+		</div>
+
+		<style type="text/css">
+			.modal_custom {
+			    display: none;
+			    position: fixed;
+			    z-index: 1;
+			    left: 0;
+			    top: 0;
+			    width: 100%;
+			    height: 100%;
+			    overflow: auto;
+			    background-color: rgba(0,0,0,0.7);
+				justify-content: center;
+				align-items: center;
+			}
+			.modal_custom-content {
+			    background-color: white;
+			    margin: 20% auto;
+			    padding: 30px;
+			    border: 1px solid #888;
+			}
+		</style>
+
+		<script type="text/javascript">
+			var mymodal_custom_mark_att = document.getElementById('mymodal_custom_mark_att');
+			var mymodal_custom_add_fee = document.getElementById('mymodal_custom_add_fee');
+			
+			function mark_attendance(){
+				mymodal_custom_mark_att.style.display = "flex";
+			}
+			function add_fee(){
+				mymodal_custom_add_fee.style.display = "flex";
+			}
+
+			window.onclick = function(event) {
+			    if (event.target == mymodal_custom_mark_att) {
+			        mymodal_custom_mark_att.style.display = "none";
+			    }
+			    else if (event.target == mymodal_custom_add_fee) {
+			        mymodal_custom_add_fee.style.display = "none";
+			    }
+			}
+
+			$(document).keydown(function(event) {
+				if (event.keyCode == 27) {
+					$('#mymodal_custom_mark_att').hide();
+					$('#mymodal_custom_add_fee').hide();
+				}
+			});
+		</script>
+
+
+	{% else %}
+	<div class="jumbotron">
+		<h4>Tution Management</h4>
+		<p>Welcome, stranger!</p>
+		<p>This is a simple webapp made to help manage the tuition classes for the tutors.</p>
+		<p>You need to be logged in to use the features! *grin*</p>
+		<p>But first go to the <a href="{% url 'accounts:registration' %}">registration page.</a></p>
+		<p>Or, if you are an old user, <a href="{% url 'accounts:login' %}">login</a>.</p>
+		
+	</div>
+	{% endif %}
 {% endblock %}
