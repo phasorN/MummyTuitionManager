@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView
@@ -16,24 +16,11 @@ def Index(request):
 	if not request.user.is_authenticated:
 		return render(request, "main/index.html",{})
 
-	# else:
-	# students = Student.objects.filter(tutor=request.user, left=False)
-	# grade_dict = students.values('grade').distinct()
-	# grade_list = []
-	# for x in grade_dict:
-	# 	grade_list.append(x['grade'])
-
-	# number_stud_grade = {}
-
-	# for grade in grade_list:
-	# 	number_of_students = Student.objects.filter(tutor=request.user, grade=int(grade), left=False).count()
-	# 	number_stud_grade.update({
-	# 			grade: number_of_students
-	# 		})
-
+	# If user is logged in.
+	recent_fee_payments = Fee.objects.filter(tutor=request.user).order_by('-added_on')[:5]
 	today = dt.datetime.now().date().strftime('%Y-%m-%d')
 
-	return render(request, "main/index.html", {'date_today': today})
+	return render(request, "main/index.html", {'date_today': today, 'recent_fee_payments': recent_fee_payments})
 
 
 class StudentCreateView(LoginRequiredMixin, CreateView):
@@ -71,8 +58,9 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
 		pk=self.kwargs.get('pk')
 		student = Student.objects.get(pk=pk)
 		studentAttendance = Attendance.objects.filter(student=student).order_by('-date')
+		feeDetails = Fee.objects.filter(tutor=self.request.user, student=student)
 		# print(studentAttendance)
-		context.update({'studentAttendance': studentAttendance})
+		context.update({'studentAttendance': studentAttendance, 'feeDetails': feeDetails})
 		return context
 
 @login_required
@@ -172,6 +160,35 @@ def AttendanceChangeView(request):
 		
 @login_required
 def FeeCreateView(request):
-	students_class_9 = Student.objects.filter(grade=9)
-	students_class_10 = Student.objects.filter(grade=10)
-	return render(request, "main/fee_form.html", {'students_class_9':students_class_9, 'students_class_10':students_class_10})
+	if request.method == "GET":
+
+		today = dt.datetime.now().date().strftime("%Y-%m-%d")
+		yesterday = (dt.datetime.now().date() - timedelta(1)).strftime("%Y-%m-%d")
+		students_class_9 = Student.objects.filter(tutor=request.user, grade=9)
+		students_class_10 = Student.objects.filter(tutor=request.user, grade=10)
+		return render(request, "main/fee_form.html", {'students_class_9':students_class_9, 'students_class_10':students_class_10, 'today': today, 'yesterday': yesterday})
+
+	elif request.method == "POST":	
+
+		date_paid = request.POST.get('date_paid')
+		amount = request.POST.get('amount')
+		pk = request.POST.get('pk')
+		student = Student.objects.get(pk=pk)
+
+		if Fee.objects.filter(tutor=request.user, student=student, date_paid=date_paid, amount=amount).count() >= 1:
+			if request.POST.get('add_again'):
+				added_on = dt.datetime.now()
+				fee = Fee.objects.create(tutor=request.user, student=student, date_paid=date_paid, amount=amount, added_on=added_on)
+			else:
+				today = dt.datetime.now().date().strftime("%Y-%m-%d")
+				yesterday = (dt.datetime.now().date() - timedelta(1)).strftime("%Y-%m-%d")
+				students_class_9 = Student.objects.filter(tutor=request.user, grade=9)
+				students_class_10 = Student.objects.filter(tutor=request.user, grade=10)
+				error = "You already added that '" + student.name + " paid Rs " + amount + " on " + date_paid + ".'"
+				return render(request, "main/fee_details_duplicate.html", {'error_part1': error, 'error_part2':  'Do you want to add again?', 'date_paid': date_paid, 'amount':amount, 'pk': pk})
+		else:
+			added_on = dt.datetime.now()
+			Fee.objects.create(tutor=request.user, student=student, date_paid=date_paid, amount=amount, added_on=added_on)
+			fee = Fee.objects.get(tutor=request.user, student=student, date_paid=date_paid, amount=amount, added_on=added_on)
+			
+		return HttpResponseRedirect(reverse('main:index') + "?hover_id=" + str(fee.pk))

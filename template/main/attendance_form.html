@@ -55,7 +55,9 @@
 	<div>
 		<h4 class="centre">Attendance | Class: {{ grade }}</h4>
 		{% if not number_of_unmarked == 0%}
-		<h5 style="color: red" class="centre">{{ number_of_unmarked }} Unmarked</h5>
+		<h5 style="color: red" class="centre">
+			<span id="number_of_unmarked">{{ number_of_unmarked }}</span> Unmarked
+		</h5>
 		{% endif %}
 		<center>
 			<a href="?date={{ date_minus|date:'Y-m-d' }}&class={{ grade }}">Prev</a>
@@ -145,12 +147,14 @@
 
 		function present(pk){
 			pk = parseInt(pk)
+			var unmarked = parseInt($('#number_of_unmarked').text())
 			$.ajax({
 				url: mark_url,
 				method: "GET",
 				dataType: "json",
 				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
 				success: function (data){
+					$('#number_of_unmarked').text(unmarked - 1)
 					$("#during_mark_"+pk).hide();
 					$("#am_absent_"+pk).hide();
 					$("#after_mark_"+pk).toggle();
@@ -162,12 +166,14 @@
 		}
 		function absent(pk){
 			pk = parseInt(pk)
+			var unmarked = parseInt($('#number_of_unmarked').text())
 			$.ajax({
 				url: mark_url,
 				method: "GET",
 				dataType: "json",
 				data: "pk=" + pk + "&value=0&date={{date|date:'d-m-Y'}}",
 				success: function (data){
+					$('#number_of_unmarked').text(unmarked - 1)
 					$("#during_mark_"+pk).hide();
 					$("#am_present_"+pk).hide();
 					$("#after_mark_"+pk).toggle();

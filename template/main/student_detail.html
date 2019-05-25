@@ -39,6 +39,20 @@
 	</table>
 	<br>
 
+	<h5>Fee Details</h5>
+	<table>
+		<thead><td class="td1">Date Paid</td><td class="td2">Amount</td></thead>
+		{% for x in feeDetails %}
+			<tr><td class="td1">{{ x.date_paid }}</td><td class="td2">{{ x.amount }}</td></tr>
+		{% empty %}
+		<table>
+			<tr><td style="padding: 40px;"><h6 style="text-align: center;">No data yet :(</h6></td></tr>
+		</table>
+		{% endfor %}
+	</table>
+
+	<br>
+
 	<h5>Attendance</h5>
 	<table>
 	{% for x in studentAttendance %}
@@ -56,6 +70,8 @@
 		
 	{% endfor %}
 	</table>
+
+	<br>
 	<br>
 	<br>
 

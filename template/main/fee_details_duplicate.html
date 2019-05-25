@@ -1,0 +1,24 @@
+{% extends 'main/base.html' %}
+{% load main_filters %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+	<title>Add Fee</title>
+{% endblock %}
+
+{% block body_block %}
+<h4 style="display: block; text-align: center;">Add Fee Details</h4>
+<hr>
+<p style="color: red;">{{ error_part1 }}</p>
+<p style="color: red;">{{ error_part2 }}</p>
+
+<form method="POST">
+	{% csrf_token %}
+	<input type="hidden" name="date_paid" value="{{ date_paid }}">
+	<input type="hidden" name="pk" value="{{ pk }}">
+	<input type="hidden" name="amount" value="{{ amount }}">
+	<input type="hidden" name="add_again" value="yes">
+	<button>Yes!</button>
+	<a href="{% url 'main:fee_form' %}"><button type="button">No</button></a>
+</form>
+{% endblock %}

@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 
 {% block title_block %}
-	<title>Add Fee</title>
+	<title>Fee Payment</title>
 {% endblock %}
 
 {% block body_block %}
@@ -19,14 +19,18 @@
 		padding: 10px;
 		border-radius: 5px;
 		width: 100%;
+		outline: none;
+		box-shadow: none;
 	}
 	.my_card:hover{
-		color: white;
-		background-color: #2e3038;
+		border: 2px solid black;
+		padding: 9px;
+		box-shadow: none;
 	}
 	.my_card:focus{
 		color: white;
 		background-color: #2e3038;
+		box-shadow: none;
 	}
 	#main_container{
 		border-top: 1px solid black;
@@ -35,8 +39,41 @@
 	.row{
 		margin: 0px!important;
 	}
+	table, input{
+		width: 100%;
+		padding: 5px!important;
+	}
+	input{
+		background-color: transparent;
+		border: 1px solid grey;
+		/*border-radius: 10px;*/
+		padding: 5px;
+	}
+	#modal_submit_button{
+		cursor: pointer;
+	}
+	#modal_submit_button:hover{
+		background-color: black;
+		color: white;
+	}
+	.helptext{
+		border: 1px solid black;
+		padding: 5px;
+		border-radius: 10px;
+		font-size: 0.85rem;
+	}
+	.helptext:hover{
+		cursor: pointer;
+		border: 2px solid black;
+		padding: 4px;
+		outline: none!important;
+	}
+	.helptext:focus{
+		outline: none;
+		box-shadow: none;
+	}
 </style>
-<h4 style="display: block; text-align: center;">Add Fee Details</h4>
+<h4 style="display: block; text-align: center;">Fee Payment</h4>
 
 <div id="main_container">
 <br>
@@ -54,37 +91,84 @@
 	<div id="class_9_students" class="row">
 		{% for sc9 in students_class_9 %}
 			<div class="my_card_container">
-				<button class="my_card btn" onclick="student_selected('{{ sc9.pk }}')">{{ sc9.name }}</button>
+				<button class="my_card btn" onclick="student_selected('{{ sc9.name}} ', '{{ sc9.pk }}')">{{ sc9.name }}</button>
 			</div>
 		{% endfor %}
 	</div>
 	<div id="class_10_students" class="row" style="display: none;">
 		{% for sc10 in students_class_10 %}
 			<div class="my_card_container">
-				<button class="my_card btn" onclick="student_selected('{{ sc10.pk }}')">{{ sc10.name }}</button>
+				<button class="my_card btn" onclick="student_selected('{{ sc10.name}} ', '{{ sc10.pk }}')">{{ sc10.name }}</button>
 			</div>
 		{% endfor %}
+	</div>
+	<div id="my_modal_fee_details" class="modal_custom">
+		<div class="modal_custom-content">
+			<h4 style="text-align: center;">
+				<span id="modal_student_name"></span>
+			</h4>
+			<form accept="" method="POST">
+				<table>
+					<tr>
+						<td><label for="date_paid">Date Paid:</label></td>
+						<td><input id="date_paid" type="date" name="date_paid" required="true"></td>
+					</tr>
+
+					<tr>
+						<td></td>
+						<td>
+						<button type="button" onclick="fill_today()" class="helptext">Today?</button>
+						<button type="button" class="helptext" onclick="fill_yesterday()">Yesterday?</button>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="amount">Amount:</label></td>
+						<td><input id="amount" type="number" name="amount" required="true"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+						<button type="button" onclick="fill_800()" class="helptext">800?</button>
+						<button type="button" class="helptext" onclick="fill_900()">900?</button>
+						</td>
+					</tr>
+
+				</table>
+				<br>
+				<input id="modal_student_pk" type="hidden" name="pk" value="">
+				{% csrf_token %}
+				<input id="modal_submit_button" type="submit" placeholder="Submit">
+			</form>
+		</div>
+	</div>
+
+		<style type="text/css">
+			.modal_custom {
+			    display: none;
+			    position: fixed;
+			    z-index: 1;
+			    left: 0;
+			    top: 0;
+			    width: 100%;
+			    height: 100%;
+			    overflow: auto;
+			    background-color: rgba(0,0,0,0.7);
+				justify-content: center;
+				align-items: center;
+			}
+			.modal_custom-content {
+			    background-color: white;
+			    margin: 20% auto;
+			    padding: 30px;
+			    border: 1px solid #888;
+			}
+		</style>
 	</div>
 	<script type="text/javascript">
 		var url_string = window.location.href;
 		var url = new URL(url_string)
 		url_grade = url.searchParams.get('grade')
-		if(url_grade){
-			console.log(url_grade);
-			var grade = document.getElementById('class'+ url_grade);
-			var grade_students = document.getElementById('class_'+ url_grade + '_students');
-			// grade.style.backgroundColor = "black";
-			// grade.style.color = "white";
-			// grade_students.style.display = "flex";
-			var a = grade;
-			changeBack(a);
-		}
-		else{
-			var class9 = document.getElementById('class9');
-			class9.style.backgroundColor = "black";
-			class9.style.color = "white";
-		}
-
+		
 		function changeBack(a) {
 			var class9 = document.getElementById('class9');
 			var class10 = document.getElementById('class10');
@@ -115,11 +199,60 @@
 				class_9_students.style.display="none";
 			}
 		}
+		
+		function student_selected(name, pk){
+			// alert("INCOMPLETE\nstudent.pk: " + pk + "\nPopup a modal and then ask for amount and month. Forward the student pk with the month and amount.");
+			var my_modal_fee_details = document.getElementById('my_modal_fee_details');
+			my_modal_fee_details.style.display = "flex";
+			var modal_student_name = document.getElementById('modal_student_name');
+			modal_student_name.innerHTML = name;
 
-		function student_selected(pk){
-			alert("INCOMPLETE\nstudent.pk: " + pk + "\nPopup a modal and then ask for amount and month. Forward the student pk with the month and amount.");
-
+			var modal_student_pk = document.getElementById('modal_student_pk');
+			modal_student_pk.value = pk;
 		}
+		window.onclick = function(event) {
+		    if (event.target == my_modal_fee_details) {
+		        my_modal_fee_details.style.display = "none";
+		        document.getElementById('amount').value = "";
+		        document.getElementById('date_paid').value = "";
+		    }
+		}
+		$(document).keydown(function(event) {
+			if (event.keyCode == 27) {
+				$('#my_modal_fee_details').hide();
+		        document.getElementById('amount').value = "";
+				document.getElementById('date_paid').value = "";
+			}
+		});
+		if(url_grade){
+			console.log(url_grade);
+			var grade = document.getElementById('class'+ url_grade);
+			var grade_students = document.getElementById('class_'+ url_grade + '_students');
+			var a = grade;
+			changeBack(a);
+		}
+		else{
+			var class9 = document.getElementById('class9');
+			class9.style.backgroundColor = "black";
+			class9.style.color = "white";
+		}
+
+		function fill_today(){
+			document.getElementById('date_paid').value = '{{ today }}'
+		}
+
+		function fill_yesterday(){
+			document.getElementById('date_paid').value = '{{ yesterday }}'
+		}
+
+		function fill_800(){
+			document.getElementById('amount').value = '800'
+		}
+
+		function fill_900(){
+			document.getElementById('amount').value = '900'
+		}
+
 	</script>
 	<br>
 </div>
