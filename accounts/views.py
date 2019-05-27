@@ -31,7 +31,7 @@ def userLogin(request):
 			else:
 				return HttpResponseRedirect(reverse('accounts:login'))
 		else:
-			return HttpResponseRedirect(reverse('accounts:login'))		
+			return HttpResponseRedirect(reverse('accounts:login'))
 
 class userRegistration(CreateView):
 	model = User
@@ -40,7 +40,7 @@ class userRegistration(CreateView):
 	success_url = reverse_lazy('accounts:registrationSuccess')
 
 def registrationSuccess(request):
-	return render(request, "accounts/registrationSuccess.html")
+	return render(request, 'accounts/userLogin.html', {'message': 'Hi! You have registered successfully! Please login here.'})
 
 def userLogout(request):
 	logout(request)

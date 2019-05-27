@@ -87,12 +87,16 @@
 		</div>
 	</div>
 	<hr>
-	<h5 style="margin-bottom: 20px; text-align: center;">Select Student</h5>
+	{% if students_class_9 or students_class_10%}
+    	<h5 style="margin-bottom: 20px; text-align: center;">Select Student</h5>
+    {% endif %}
 	<div id="class_9_students" class="row">
 		{% for sc9 in students_class_9 %}
 			<div class="my_card_container">
 				<button class="my_card btn" onclick="student_selected('{{ sc9.name}} ', '{{ sc9.pk }}')">{{ sc9.name }}</button>
 			</div>
+		{% empty %}
+            <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to continue.</h5>
 		{% endfor %}
 	</div>
 	<div id="class_10_students" class="row" style="display: none;">
@@ -100,6 +104,8 @@
 			<div class="my_card_container">
 				<button class="my_card btn" onclick="student_selected('{{ sc10.name}} ', '{{ sc10.pk }}')">{{ sc10.name }}</button>
 			</div>
+		{% empty %}
+		    <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to continue.</h5>
 		{% endfor %}
 	</div>
 	<div id="my_modal_fee_details" class="modal_custom">
@@ -168,7 +174,7 @@
 		var url_string = window.location.href;
 		var url = new URL(url_string)
 		url_grade = url.searchParams.get('grade')
-		
+
 		function changeBack(a) {
 			var class9 = document.getElementById('class9');
 			var class10 = document.getElementById('class10');
@@ -199,7 +205,7 @@
 				class_9_students.style.display="none";
 			}
 		}
-		
+
 		function student_selected(name, pk){
 			// alert("INCOMPLETE\nstudent.pk: " + pk + "\nPopup a modal and then ask for amount and month. Forward the student pk with the month and amount.");
 			var my_modal_fee_details = document.getElementById('my_modal_fee_details');

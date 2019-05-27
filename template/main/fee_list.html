@@ -1,0 +1,342 @@
+{% extends 'main/base.html' %}
+{% load main_filters %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+	<title>Fee Payment List</title>
+{% endblock %}
+
+{% block body_block %}
+<style type="text/css">
+	#fee_details_container{
+		/*display: none;*/
+		border: 1px solid black;
+		/*border-radius: 10px;*/
+	}
+	.fee_details{
+		padding: 10px;
+	}
+	.fee_details>p{
+		margin-left: 5px;
+		margin-bottom: 0px;
+	}
+	.fee_details>h6{
+		padding-left: 5px;
+	}
+	@keyframes highlight{
+		0%	{
+			background-color: white;
+			color: black;
+		}
+		50% {
+		    background-color: lightgrey;
+		    color: black;
+		}
+		100%	{
+			background-color: white;
+			color: black;
+		}
+	}
+	.animate{
+		-webkit-animation: highlight 1.5s cubic-bezier(0.4, -0.3, 1, 1);
+		-moz-animation: highlight 1.5s cubic-bezier(0.4, -0.3, 1, 1);
+		-o-animation: highlight 1.5s cubic-bezier(0.4, -0.3, 1, 1);
+		animation: highlight 1.5s cubic-bezier(0.4, -0.3, 1, 1);
+	}
+	.fee_details_main{
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+	.fee_details{
+	    position: relative;
+	}
+	.fee_details:hover{
+	    cursor: pointer;
+	    background-color: #f9f5f5;
+	}
+	.fee_details_main>p{
+		margin-left: 5px;
+		margin-bottom: 0px;
+	}
+	.fee_details_main>h6{
+		padding-left: 5px;
+	}
+	.mask{
+	    display: none;
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        /*background-color: orange;*/
+        cursor: inherit;
+	}
+	.edit_option{
+        display: flex;
+        justify-content: center;
+        /*align-items: center;*/
+	}
+	.edit_option>a{
+	    border: 1px solid black;
+	    margin-top: 10px;
+	    padding: 5px;
+	    border-radius: 5px;
+	    /*flex: 1;*/
+	}
+	.edit_option>a:hover{
+	    cursor: pointer;
+	}
+	table, input{
+		width: 100%;
+		padding: 5px!important;
+	}
+	input{
+		background-color: transparent;
+		border: 1px solid grey;
+		/*border-radius: 10px;*/
+		padding: 5px;
+	}
+	#modal_submit_button{
+		cursor: pointer;
+	}
+	#modal_submit_button:hover{
+		background-color: black;
+		color: white;
+	}
+	.helptext{
+		border: 1px solid black;
+		padding: 5px;
+		border-radius: 10px;
+		font-size: 0.85rem;
+	}
+	.helptext:hover{
+		cursor: pointer;
+		border: 2px solid black;
+		padding: 4px;
+		outline: none!important;
+	}
+	.helptext:focus{
+		outline: none;
+		box-shadow: none;
+	}
+    .modal_custom {
+	    display: none;
+	    position: fixed;
+	    z-index: 1;
+	    left: 0;
+	    top: 0;
+	    width: 100%;
+	    height: 100%;
+	    overflow: auto;
+	    background-color: rgba(0,0,0,0.7);
+		justify-content: center;
+		align-items: center;
+	}
+	.modal_custom-content {
+	    background-color: white;
+	    margin: 20% auto;
+	    padding: 30px;
+	    border: 1px solid #888;
+	}
+	.aa{
+	    border: 1px solid green!important;
+	    color: green!important
+	}
+	.aa:hover{
+	    text-decoration-line: underline!important;
+	}
+	.delete{
+	    border: 1px solid red!important;
+	    color: red!important;
+	}
+	.delete:hover{
+	    text-decoration-line: underline!important;
+	}
+	.btn_custom{
+        width: 48%;
+
+	}
+</style>
+<h4 style="text-align: center;">Fee Payment Details</h4>
+<small style="color: green;">To view fee details of individual student, go to Student Details section.</small>
+<div id="fee_details_container">
+	<div id="recent_fee_details">
+		{% for f in fee_list %}
+		<div id="fd_{{ f.pk }}" class="fee_details" onmouseover="showEditOption(this)" onmouseout="hideEditOption(this)">
+			<div class="fee_details_main">
+			    <h6>{{ f.student.name }}</h6>
+				<p>Paid: Rs {{ f.amount }}</p>
+				<p style="margin-bottom: 0px;">Date: {{ f.date_paid }}</p>
+			</div>
+            <div id="fd_{{ f.pk }}_mask" class="mask">
+                <div class="edit_option">
+                    <a class="aa" onclick="student_selected('{{ f.student.name}} ', '{{ f.student.pk }}', '{{ f.date_paid|date:'Y-m-d' }}', '{{ f.amount }}', '{{ f.added_on|date:'Y-m-d H:i:s.u' }}')">Edit</a>
+                    <a class="delete" onclick="delete_modal('{{ f.student.name}} ', '{{ f.student.pk }}', '{{ f.date_paid|date:'Y-m-d' }}', '{{ f.amount }}', '{{ f.added_on|date:'Y-m-d H:i:s.u' }}')">Delete</a>
+                </div>
+            </div>
+		</div>
+		<hr style="margin: 0px;">
+		{% empty %}
+			<h6 style="text-align: center; padding: 20px;">Nothing Yet!</h6>
+		{% endfor %}
+	</div>
+	<div id="my_modal_fee_details" class="modal_custom">
+		<div class="modal_custom-content">
+			<h4 style="text-align: center;">
+				<span id="modal_student_name"></span>
+			</h4>
+			<form action="{% url 'main:fee_update' %}" method="POST">
+				<table>
+					<tr>
+						<td><label for="date_paid_new">Date Paid:</label></td>
+						<td><input id="date_paid_new" type="date" name="date_paid_new" required="true"></td>
+					</tr>
+
+					<tr>
+						<td></td>
+						<td>
+						<button type="button" onclick="fill_today()" class="helptext">Today?</button>
+						<button type="button" class="helptext" onclick="fill_yesterday()">Yesterday?</button>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="amount_new">Amount:</label></td>
+						<td><input id="amount_new" type="number" name="amount_new" required="true"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+						<button type="button" onclick="fill_800()" class="helptext">800?</button>
+						<button type="button" class="helptext" onclick="fill_900()">900?</button>
+						</td>
+					</tr>
+
+				</table>
+				<br>
+				<input id="modal_student_pk" type="hidden" name="pk" value="">
+				<input id="date_paid" type="hidden" name="date_paid" required="true">
+				<input id="added_on" type="hidden" name="added_on" required="true">
+				<input id="amount" type="hidden" name="amount" required="true">
+				{% csrf_token %}
+				<input id="modal_submit_button" type="submit" placeholder="Submit">
+			</form>
+		</div>
+	</div>
+
+	<div id="my_modal_confirm_delete" class="modal_custom">
+		<div class="modal_custom-content">
+		    <h5 style="text-align: center;">Remove Payment Details?</h5>
+			<div style="text-align: center;">
+			    <p style="margin: 0px;" id="name_text"></p>
+			    <p style="margin: 0px;">Rs <span id="amount_text"></span></p>
+			    <p style="margin: 0px;" id="date_paid_text"></p>
+			</div>
+		    <form action="{% url 'main:fee_delete' %}" method="GET">
+		        <input id="dm_modal_student_pk" type="hidden" name="pk" value="">
+				<input id="dm_date_paid" type="hidden" name="date_paid" required="true">
+				<input id="dm_added_on" type="hidden" name="added_on" required="true">
+				<input id="dm_amount" type="hidden" name="amount" required="true">
+				<button class="btn btn-danger btn_custom" type="submit">Yes</button>
+				<button class="btn btn-success btn_custom" type="button" onclick="hideModal()">No</button>
+		    </form>
+	    </div>
+    </div>
+	<script type="text/javascript">
+		var url_string = window.location.href;
+		var url = new URL(url_string)
+		var hover_id = url.searchParams.get('hover_id')
+		var open_modal = url.searchParams.get('open_modal')
+
+		// alert(hover_id)
+		if (hover_id){
+			$('#fd_' + hover_id).addClass('animate')
+        }
+		if(open_modal){
+            console.log(open_modal);
+            $('#fd_' + open_modal).addClass('animate')
+		}
+		function showEditOption(e){
+            e.querySelector('.fee_details_main').style.opacity = "0.5";
+            e.style.backgroundColor = "lightgrey";
+            e.querySelector('.mask').style.display = "block";
+        }
+        function hideEditOption(e){
+            e.querySelector('.mask').style.display = "none";
+            e.style.backgroundColor = "transparent";
+            e.querySelector('.fee_details_main').style.opacity = "1";
+        }
+		function student_selected(name, pk, date_paid, amount, added_on){
+		    console.log(date_paid);
+		    console.log(amount);
+		    console.log(added_on);
+			// alert("INCOMPLETE\nstudent.pk: " + pk + "\nPopup a modal and then ask for amount and month. Forward the student pk with the month and amount.");
+			var my_modal_fee_details = document.getElementById('my_modal_fee_details');
+			my_modal_fee_details.style.display = "flex";
+			var modal_student_name = document.getElementById('modal_student_name');
+			modal_student_name.innerHTML = name;
+
+			document.getElementById('date_paid').value = date_paid;
+			document.getElementById('amount').value = amount;
+			document.getElementById('date_paid_new').value = date_paid;
+			document.getElementById('amount_new').value = amount;
+			document.getElementById('added_on').value = added_on;
+            document.getElementById('modal_student_pk').value = pk;
+		}
+		function delete_modal(name, pk, date_paid, amount, added_on){
+		    console.log("pk:" + pk)
+		    document.getElementById('my_modal_confirm_delete').style.display = "flex";
+		    document.getElementById('dm_date_paid').value = date_paid;
+		    document.getElementById('dm_amount').value = amount;
+		    document.getElementById('dm_added_on').value = added_on;
+		    document.getElementById('dm_modal_student_pk').value = pk;
+		    document.getElementById('name_text').innerHTML = name;
+		    document.getElementById('amount_text').innerHTML = amount;
+		    document.getElementById('date_paid_text').innerHTML = date_paid;
+		}
+		window.onclick = function(event) {
+		    if (event.target == my_modal_fee_details) {
+		        my_modal_fee_details.style.display = "none";
+		        document.getElementById('amount').value = "";
+				document.getElementById('date_paid').value = "";
+		        document.getElementById('amount_new').value = "";
+				document.getElementById('date_paid_new').value = "";
+				document.getElementById('added_on').value = "";
+		    }
+		    else if (event.target == my_modal_confirm_delete) {
+		        my_modal_confirm_delete.style.display = "none";
+		    }
+		}
+		function hideModal(){
+		    document.getElementById('my_modal_confirm_delete').style.display = "none";
+		}
+		$(document).keydown(function(event) {
+			if (event.keyCode == 27) {
+				$('#my_modal_fee_details').hide();
+				$('my_modal_confirm_delete').hide();
+		        document.getElementById('amount').value = "";
+				document.getElementById('date_paid').value = "";
+		        document.getElementById('amount_new').value = "";
+				document.getElementById('date_paid_new').value = "";
+				document.getElementById('added_on').value = "";
+			}
+		});
+		function fill_today(){
+			document.getElementById('date_paid_new').value = '{{ today }}'
+		}
+
+		function fill_yesterday(){
+			document.getElementById('date_paid_new').value = '{{ yesterday }}'
+		}
+
+		function fill_800(){
+			document.getElementById('amount_new').value = '800'
+		}
+
+		function fill_900(){
+			document.getElementById('amount_new').value = '900'
+		}
+	</script>
+</div>
+<br>
+<br>
+<br>
+{% endblock %}

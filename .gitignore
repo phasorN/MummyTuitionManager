@@ -3,3 +3,4 @@
 # manage.py
 # **/wsgi.py
 db.sqlite3
+db_backup.sqlite3

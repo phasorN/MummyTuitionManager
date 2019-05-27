@@ -39,7 +39,7 @@
 		}
 		#rfdc_button{
 			border-bottom-left-radius: 0px;
-			border-bottom-right-radius: 0px;	
+			border-bottom-right-radius: 0px;
 		}
 		.my_card_container{
 			padding: 10px;
@@ -75,8 +75,12 @@
 		}
 		@keyframes highlight{
 			0%	{
-				background-color: lightgrey;
+				background-color: white;
 				color: black;
+			}
+			50% {
+			    background-color: lightgrey;
+			    color: black;
 			}
 			100%	{
 				background-color: white;
@@ -89,21 +93,73 @@
 			-o-animation: highlight 1.5s cubic-bezier(0.4, -0.3, 1, 1);
 			animation: highlight 1.5s cubic-bezier(0.4, -0.3, 1, 1);
 		}
-		.fee_details{
+		.fee_details_main{
 			padding-top: 5px;
 			padding-bottom: 5px;
 		}
-		.fee_details>p{
+		.fee_details{
+		    position: relative;
+		}
+		.fee_details:hover{
+		    cursor: pointer;
+		    background-color: #f9f5f5;
+		}
+		.fee_details_main>p{
 			margin-left: 5px;
 			margin-bottom: 0px;
 		}
-		.fee_details>h6{
+		.fee_details_main>h6{
 			padding-left: 5px;
+		}
+		.mask{
+		    display: none;
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            /*background-color: orange;*/
+            cursor: inherit;
+		}
+		.edit_option{
+            display: flex;
+            justify-content: center;
+            /*align-items: center;*/
+		}
+		.edit_option>a{
+		    border: 1px solid black;
+		    margin-top: 10px;
+		    padding: 5px;
+		    border-radius: 5px;
+		    /*flex: 1;*/
+		}
+		.edit_option>a:hover{
+		    cursor: pointer;
 		}
 		*{
 			/*border: 1px solid black;*/
 		}
 	</style>
+	<style type="text/css">
+			.modal_custom {
+			    display: none;
+			    position: fixed;
+			    z-index: 1;
+			    left: 0;
+			    top: 0;
+			    width: 100%;
+			    height: 100%;
+			    overflow: auto;
+			    background-color: rgba(0,0,0,0.7);
+				justify-content: center;
+				align-items: center;
+			}
+			.modal_custom-content {
+			    background-color: white;
+			    margin: 20% auto;
+			    padding: 30px;
+			    border: 1px solid #888;
+			}
+		</style>
 	{% if user.is_authenticated %}
 		<h4 style="text-align: center;">Tution Management</h4>
 		<br>
@@ -127,15 +183,28 @@
 		<div id="recent_fee_details_container">
 			<div id="recent_fee_details">
 				{% for f in recent_fee_payments %}
-				<div id="fd_{{ f.pk }}" class="fee_details">
-					<h6>{{ f.student.name }}</h6>
-					<p>Paid: Rs {{ f.amount }}</p>
-					<p style="margin-bottom: 0px;">Date: {{ f.date_paid }}</p>
+				<div id="fd_{{ f.pk }}" class="fee_details" onmouseover="showEditOption(this)" onmouseout="hideEditOption(this)">
+					<div class="fee_details_main">
+					    <h6>{{ f.student.name }}</h6>
+    					<p>Paid: Rs {{ f.amount }}</p>
+    					<p style="margin-bottom: 0px;">Date: {{ f.date_paid }}</p>
+					</div>
+                    <div id="fd_{{ f.pk }}_mask" class="mask">
+                        <div class="edit_option">
+                            <a style="border:1px solid #007bff;" href="{% url 'main:fee_list' %}?open_modal={{ f.pk }}">Edit</a>
+                        </div>
+                    </div>
 				</div>
 				<hr style="margin: 0px;">
 				{% empty %}
-					<h6 style="text-align: center;">It's empty :(</h6>
+					<h6 style="text-align: center; padding: 20px;">Nothing Yet!</h6>
 				{% endfor %}
+
+				{% if recent_fee_payments %}
+                <div class="fee_details">
+                    <p style="text-align: center;"><a href="{% url 'main:fee_list' %}" >View all</a></p>
+				</div>
+				{% endif %}
 			</div>
 		</div>
 
@@ -184,28 +253,6 @@
 			</div>
 		</div>
 
-		<style type="text/css">
-			.modal_custom {
-			    display: none;
-			    position: fixed;
-			    z-index: 1;
-			    left: 0;
-			    top: 0;
-			    width: 100%;
-			    height: 100%;
-			    overflow: auto;
-			    background-color: rgba(0,0,0,0.7);
-				justify-content: center;
-				align-items: center;
-			}
-			.modal_custom-content {
-			    background-color: white;
-			    margin: 20% auto;
-			    padding: 30px;
-			    border: 1px solid #888;
-			}
-		</style>
-
 		<script type="text/javascript">
 			var url_string = window.location.href;
 			var url = new URL(url_string)
@@ -229,7 +276,7 @@
 			}
 			var mymodal_custom_mark_att = document.getElementById('mymodal_custom_mark_att');
 			var mymodal_custom_add_fee = document.getElementById('mymodal_custom_add_fee');
-			
+
 			function mark_attendance(){
 				mymodal_custom_mark_att.style.display = "flex";
 			}
@@ -237,6 +284,16 @@
 				mymodal_custom_add_fee.style.display = "flex";
 			}
 
+            function showEditOption(e){
+                e.querySelector('.fee_details_main').style.opacity = "0.5";
+                e.style.backgroundColor = "lightgrey";
+                e.querySelector('.mask').style.display = "block";
+            }
+            function hideEditOption(e){
+                e.querySelector('.mask').style.display = "none";
+                e.style.backgroundColor = "transparent";
+                e.querySelector('.fee_details_main').style.opacity = "1";
+            }
 			window.onclick = function(event) {
 			    if (event.target == mymodal_custom_mark_att) {
 			        mymodal_custom_mark_att.style.display = "none";
@@ -267,7 +324,8 @@
 		<p>You need to be logged in to use the features! *grin*</p>
 		<p>But first go to the <a href="{% url 'accounts:registration' %}">registration page.</a></p>
 		<p>Or, if you are an old user, <a href="{% url 'accounts:login' %}">login</a>.</p>
-		
+
 	</div>
 	{% endif %}
+
 {% endblock %}

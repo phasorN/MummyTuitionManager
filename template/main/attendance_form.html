@@ -7,14 +7,22 @@
 {% endblock %}
 
 {% block body_block %}
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    {% if noStudentsYet %}
+
+        <h4 style="text-align: center;">Attendance | Class: {{ grade }}</h4>
+        <h5 style="text-align: center;">{{ date }}</h5>
+        <br>
+        <br>
+        <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to continue.</h5>
+    {% else %}
 
 	<style type="text/css">
 		.centre{
 			text-align: center;
 		}
 		.attendanceCard{
-			margin:0 auto; 
+			margin:0 auto;
 			margin-bottom: 10px;
 			/*border: 1px solid black;*/
 			padding: 20px;
@@ -52,28 +60,123 @@
 		}
 	</style>
 
-	<div>
-		<h4 class="centre">Attendance | Class: {{ grade }}</h4>
-		{% if not number_of_unmarked == 0%}
-		<h5 style="color: red" class="centre">
-			<span id="number_of_unmarked">{{ number_of_unmarked }}</span> Unmarked
-		</h5>
-		{% endif %}
-		<center>
-			<a href="?date={{ date_minus|date:'Y-m-d' }}&class={{ grade }}">Prev</a>
-			<h5 style="display: inline-block;"> {{ date }}</h5>
-			<a href="?date={{ date_plus|date:'Y-m-d' }}&class={{ grade }}">Next</a>
-		</center>
+    <h4 class="centre">Attendance | Class: {{ grade }}</h4>
 
+    {% if not number_of_unmarked == 0%}
+	<h5 id="number_of_unmarked_container" style="color: red" class="centre">
+		<span id="number_of_unmarked">{{ number_of_unmarked }}</span> Unmarked
+	</h5>
+	{% endif %}
+
+	<center>
+		<a href="{% url 'main:attendance_form' %}?date={{ date_minus|date:'Y-m-d' }}&class={{ grade }}">Prev</a>
+		<h5 style="display: inline-block;"> {{ date }}</h5>
+		{% if date_plus %}
+			<a href="{% url 'main:attendance_form' %}?date={{ date_plus|date:'Y-m-d' }}&class={{ grade }}">Next</a>
+		{% else %}
+    		<a>Next</a>
+		{% endif %}
+	</center>
+
+	{% if markedHoliday %}
+		<div id="holiday">
+	        <br>
+	        <br>
+	        <h5 style="text-align: center; color: green;">It was a holiday :)</h5>
+	        <a style="display: block; text-align: center;" href="/attendance/not_holiday/?date={{ date|date:'Y-m-d' }}&class={{ grade }}">Not a holiday?</a>
+	    </div>
+	{% endif %}
+
+    <!-- Main Modal -->
+    {% if not number_of_unmarked == 0%}
+
+	<div id="taught_or_not_modal" class="modal_custom">
+		<div class="modal_custom-content">
+			<h5 style="text-align: center;">{{ date }} | {{ day }}</h5>
+			<h5 style="text-align: center;">Class {{ grade }}</h5>
+			<div class="my_card_container" onclick="taught()">
+				<div class="my_card btn">
+					<h5>Class</h5>
+				</div>
+			</div>
+
+			<div class="my_card_container" onclick="holiday()">
+				<a href="/attendance/holiday/?date={{ date|date:'Y-m-d' }}&class={{ grade }}" class="my_card btn">
+					<h5>Holiday</h5>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<style type="text/css">
+	    #attendance_details{
+	        display: none;
+	    }
+		.modal_custom {
+		    display: flex;
+		    position: fixed;
+		    z-index: 1;
+		    left: 0;
+		    top: 0;
+		    width: 100%;
+		    height: 100%;
+		    overflow: auto;
+		    background-color: rgba(0,0,0, 0.95);
+			justify-content: center;
+			align-items: center;
+		}
+		.modal_custom-content {
+		    background-color: white;
+		    margin: 20% auto;
+		    padding: 30px;
+		    border: 1px solid #888;
+		}
+		.my_card_container{
+			padding: 10px;
+		}
+		.my_card{
+			border:1px solid black;
+			display: inline-block!important;
+			padding: 5px;
+			padding-top: 10px;
+			border-radius: 5px;
+			width: 100%;
+			text-align: center;
+			color: grey;
+		}
+		.my_card:hover{
+			color: white;
+			background-color: #2e3038;
+		}
+		a{
+			margin: 0px;
+			padding: 0px;
+			color: grey;
+		}
+	</style>
+
+	<script type="text/javascript">
+        function taught(){
+            $('#attendance_details').show();
+            $('#holiday').hide();
+            $('#taught_or_not_modal').hide();
+        }
+	</script>
+
+	{% endif %}
+	<!--Main Modal Ends-->
+
+	<div id="attendance_details">
 		{% for s in students %}
 			<div class="attendanceCard col-md-6 col-lg-6" id="attendanceCard_{{s.pk}}" style="
-			background-color: 
 			{% if attVal|get_item:s.pk == 1 %}
-				#bff3c8;
+				background-color: #bff3c8;
 			{% elif attVal|get_item:s.pk == 0 %}
-				#e8aaaa;
-			{% else %}
-				#eeeeee;
+				background-color: #e8aaaa;
+			{% elif attVal|get_item:s.pk == -1 %}
+			    background-color: transparent;
+			    border-top: 1px solid grey;
+			    border-radius: 0px;
 			{% endif %}
 			">
 				{% if attVal|get_item:s.pk == 1 %}
@@ -102,7 +205,7 @@
 						style="display:none;">{{ s.name }} was present</span>
 						<button disabled="true" class="btn btn-sm" id="change_{{ s.pk }}" style="display: inline-block; float: right;">Changed</button>
 					</div>
-				{% else %}
+				{% elif attVal|get_item:s.pk == -1 %}
 				<!-- Not marked yet. -->
 					<div id="before_mark_{{ s.pk }}" style="text-align: center;">
 						<h5 class="studentName">{{ s.name }}</h5>
@@ -111,7 +214,7 @@
 						<button id="a_{{ s.pk }}" class="absent"
 						onclick="absent('{{ s.pk }}')">Absent</button>
 					</div>
-					
+
 					<div id="during_mark_{{ s.pk }}" style="display: none;">
 						Marking attendance for {{ s.name }}...
 					</div>
@@ -133,13 +236,14 @@
 							<button disabled="true" class="btn btn-sm" id="change_{{ s.pk }}" style="display: inline-block; float: right;">Changed</button>
 						</div>
 					</div>
+				{% elif attVal|get_item:s.pk == -5 %}
+					{# No Class Held #}
 				{% endif %}
 			</div>
 		{% endfor %}
 		<br>
 		<br>
 	</div>
-
 	<script type="text/javascript">
 		var wl = window.location;
 		var mark_url = wl.protocol + "//" + wl.hostname + ":" + wl.port + "/attendance/mark/";
@@ -147,18 +251,23 @@
 
 		function present(pk){
 			pk = parseInt(pk)
-			var unmarked = parseInt($('#number_of_unmarked').text())
 			$.ajax({
 				url: mark_url,
 				method: "GET",
 				dataType: "json",
 				data: "pk=" + pk + "&value=1&date={{date|date:'d-m-Y'}}",
 				success: function (data){
+				    var unmarked = parseInt($('#number_of_unmarked').text());
 					$('#number_of_unmarked').text(unmarked - 1)
+					if(unmarked -1 == 0){
+					    $('#number_of_unmarked_container').hide()
+					}
 					$("#during_mark_"+pk).hide();
 					$("#am_absent_"+pk).hide();
 					$("#after_mark_"+pk).toggle();
 					$("#attendanceCard_"+pk).css("background-color", "#bff3c8");
+					$("#attendanceCard_"+pk).css("border-radius", "10px");
+					$("#attendanceCard_"+pk).css("border", "none");
 				}
 			});
 			$("#before_mark_"+pk).hide();
@@ -166,18 +275,23 @@
 		}
 		function absent(pk){
 			pk = parseInt(pk)
-			var unmarked = parseInt($('#number_of_unmarked').text())
 			$.ajax({
 				url: mark_url,
 				method: "GET",
 				dataType: "json",
 				data: "pk=" + pk + "&value=0&date={{date|date:'d-m-Y'}}",
 				success: function (data){
+				    var unmarked = parseInt($('#number_of_unmarked').text());
 					$('#number_of_unmarked').text(unmarked - 1)
+					if(unmarked -1 == 0){
+					    $('#number_of_unmarked_container').hide()
+					}
 					$("#during_mark_"+pk).hide();
 					$("#am_present_"+pk).hide();
 					$("#after_mark_"+pk).toggle();
 					$("#attendanceCard_"+pk).css("background-color", "#e8aaaa");
+					$("#attendanceCard_"+pk).css("border-radius", "10px");
+					$("#attendanceCard_"+pk).css("border", "none");
 				}
 			});
 			$("#before_mark_"+pk).hide();
@@ -199,10 +313,14 @@
 					if (data.changedTo == 0) {
 						$("#ac_absent_"+pk).show();
 						$("#attendanceCard_"+pk).css("background-color", "#e8aaaa");
+    					$("#attendanceCard_"+pk).css("border-radius", "10px");
+    					$("#attendanceCard_"+pk).css("border", "none");
 					}
 					else if(data.changedTo == 1){
 						$("#ac_present_"+pk).show();
 						$("#attendanceCard_"+pk).css("background-color", "#bff3c8");
+    					$("#attendanceCard_"+pk).css("border-radius", "10px");
+    					$("#attendanceCard_"+pk).css("border", "none");
 					}
 
 					$("#after_change_"+pk).show();
@@ -212,5 +330,6 @@
 			$("#during_change_"+pk).toggle();
 		}
 	</script>
+    {% endif %}
 
 {% endblock %}
