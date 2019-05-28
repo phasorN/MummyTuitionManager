@@ -36,7 +36,7 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
 
 	def get_initial(self):
 		initial = super().get_initial()
-		date_f = dt.datetime.strptime('01-05-2018', "%d-%m-%Y")
+		date_f = dt.datetime.now().date()
 		# date = dt.datetime(date_f)
 		initial.update({ 'date_joined': date_f })
 		return initial

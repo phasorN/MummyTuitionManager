@@ -7,6 +7,8 @@ class Student(models.Model):
 	name = models.CharField(max_length = 200)
 	grade = models.IntegerField()
 	date_joined = models.DateField(null = True)
+	left = models.BooleanField(null=False, default=False)
+
 
 	def __str__(self):
 		return self.name + ":class:" + str(self.grade)
