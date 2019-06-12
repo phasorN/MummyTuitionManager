@@ -37,11 +37,17 @@
     			background-color: #ecec52;
     		}
     	</style>
+        {% if student.left %}
+            <h5 style="color: red; text-align: center">Discontinued: {{ student.date_left }}</h5>
+        {% endif %}
     	<h5 style="display: inline-block;">Student Details</h5> <a href="{% url 'main:student_update' pk=student.pk %}">Edit</a>
     	<table>
-    		<tr><td class="td1">Name </td><td class="td2">{{ student.name }} </td></tr>
+    		<tr><td class="td1">Name </td><td class="td2"><strong>{{ student.name }} </strong></td></tr>
     		<tr><td class="td1">Class </td><td class="td2">{{ student.grade }} </td></tr>
     		<tr><td class="td1">Joined On </td><td class="td2">{{ student.date_joined }} </td></tr>
+            {% if student.left %}
+                <tr><td class="td1">Left On </td><td class="td2">{{ student.date_left }} </td></tr>
+            {% endif %}
     	</table>
     	<br>
 
@@ -49,7 +55,7 @@
     	<table>
     		<thead><td class="td1">Date Paid</td><td class="td2">Amount</td></thead>
     		{% for x in feeDetails %}
-    			<tr><td class="td1">{{ x.date_paid }}</td><td class="td2">{{ x.amount }}</td></tr>
+    			<tr style="background-color: #bff3c8"><td class="td1">{{ x.date_paid }}</td><td class="td2">{{ x.amount }}</td></tr>
     		{% empty %}
     		<table>
     			<tr><td style="padding: 40px;"><h6 style="text-align: center;">No data yet :(</h6></td></tr>
@@ -63,11 +69,23 @@
     	<table>
     	{% for x in studentAttendance %}
     		{% if x.value == 0 %}
-    			<tr class="absent"><td class="td1"><a href="{% url 'main:attendance_form' %}?date={{ x.date|date:'Y-m-d' }}&class={{ student.grade }}">{{ x.date }}</a></td><td class="td2" style="float: right!important;">Absent</td></tr>
+    			<tr class="absent"><td class="td1">
+                    <a href="{% url 'main:attendance_form' %}?date={{ x.date|date:'Y-m-d' }}&class={{ student.grade }}">
+                        {{ x.date }}
+                    </a>
+                </td><td class="td2" style="float: right!important;">Absent</td></tr>
     		{% elif x.value == 1 %}
-    			<tr class="present"><td class="td1"><a href="{% url 'main:attendance_form' %}?date={{ x.date|date:'Y-m-d' }}&class={{ student.grade }}">{{ x.date }}</a></td><td class="td2" style="float: right!important;">Present</td></tr>
+    			<tr class="present"><td class="td1">
+                    <a href="{% url 'main:attendance_form' %}?date={{ x.date|date:'Y-m-d' }}&class={{ student.grade }}">
+                        {{ x.date }}
+                    </a>
+                </td><td class="td2" style="float: right!important;">Present</td></tr>
     		{% elif x.value == -1 %}
-    			<tr class="notMarked"><td class="td1"><a href="{% url 'main:attendance_form' %}?date={{ x.date|date:'Y-m-d' }}&class={{ student.grade }}">{{ x.date }}</a></td><td class="td2" style="float: right!important;">Not Marked</td></tr>
+    			<tr class="notMarked"><td class="td1">
+                    <a href="{% url 'main:attendance_form' %}?date={{ x.date|date:'Y-m-d' }}&class={{ student.grade }}">
+                        {{ x.date }}
+                    </a>
+                </td><td class="td2" style="float: right!important;">Not Marked</td></tr>
     		{% endif %}
     	{% empty %}
     		<table>

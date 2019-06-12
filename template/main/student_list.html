@@ -25,6 +25,10 @@
 		color: white;
 		background-color: #2e3038;
 	}
+    .my_card_left{
+        background-color: #bfbfbf;
+        font-style: italic;
+    }
 	p{
 		margin: 0px;
 	}
@@ -40,12 +44,21 @@
 		<h5 style="margin-top: 10px; text-align: center;">Class: {{ grade }}</h5>
 		<div class="row" style="padding: 0!important;">
 			{% for student in students %}
-			<div class="my_card_container col-md-3 col-sm-4">
-				<a href="{% url 'main:student_detail' pk=student.pk %}">
-					<div class="my_card btn" style="text-align: center;">{{ student.name }}
-					</div>
-				</a>
-			</div>
+                {% if student.left %}
+                <div class="my_card_container col-md-3 col-sm-4">
+                    <a href="{% url 'main:student_detail' pk=student.pk %}">
+                        <div class="my_card btn my_card_left" style="text-align: center;">{{ student.name }}
+                        </div>
+                    </a>
+                </div>
+                {% else %}
+                <div class="my_card_container col-md-3 col-sm-4">
+                    <a href="{% url 'main:student_detail' pk=student.pk %}">
+                        <div class="my_card btn" style="text-align: center;">{{ student.name }}
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
 			{% endfor %}
 		</div>
 	{% empty %}

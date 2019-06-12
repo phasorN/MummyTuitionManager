@@ -8,6 +8,7 @@ class Student(models.Model):
 	grade = models.IntegerField()
 	date_joined = models.DateField(null = True)
 	left = models.BooleanField(null=False, default=False)
+	date_left = models.DateField(null = True)
 
 
 	def __str__(self):

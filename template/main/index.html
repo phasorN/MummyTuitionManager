@@ -173,6 +173,11 @@
 			<span style="float: right; font-size: 0.8rem; margin-top: 2px;">Open</span>
 		</button>
 		<br>
+        <button class="custom_btn" onclick="student_discontinued()">
+			<span>Add Discontinued Student</span>
+			<span style="float: right; font-size: 0.8rem; margin-top: 2px;">Open</span>
+		</button>
+		<br>
 
 		<button id="rfdc_button" class="custom_btn2" onclick="changeDisplay(this)">
 			<span>Recent Fee Payments</span>
@@ -249,7 +254,29 @@
 						</div>
 					</a>
 				</div>
+			    </div>
 			</div>
+		</div>
+        <div id="mymodal_custom_student_discontinued" class="modal_custom">
+			<div class="modal_custom-content">
+				<h5 style="text-align: center;">Add Discontinued Student</h5>
+				<div class="row" style="padding: 0!important; margin: 0 auto!important;">
+				<div class="my_card_container">
+					<a class="att" href="/student/discontinue/?grade=9">
+						<div class="my_card btn">
+							<h5 style="text-align: center;">Class 9</h5>
+						</div>
+					</a>
+				</div>
+
+				<div class="my_card_container">
+					<a class="att" href="/student/discontinue/?grade=10">
+						<div class="my_card btn">
+							<h5 style="text-align: center;">Class 10</h5>
+						</div>
+					</a>
+				</div>
+			    </div>
 			</div>
 		</div>
 
@@ -274,8 +301,9 @@
 					$("#rfdc_button").css("border-bottom-right-radius", "10px");
 				}
 			}
-			var mymodal_custom_mark_att = document.getElementById('mymodal_custom_mark_att');
-			var mymodal_custom_add_fee = document.getElementById('mymodal_custom_add_fee');
+			let mymodal_custom_mark_att = document.getElementById('mymodal_custom_mark_att');
+			let mymodal_custom_add_fee = document.getElementById('mymodal_custom_add_fee');
+			let mymodal_custom_student_discontinued = document.getElementById('mymodal_custom_student_discontinued');
 
 			function mark_attendance(){
 				mymodal_custom_mark_att.style.display = "flex";
@@ -283,6 +311,9 @@
 			function add_fee(){
 				mymodal_custom_add_fee.style.display = "flex";
 			}
+			function student_discontinued(){
+			    mymodal_custom_student_discontinued.style.display = "flex";
+            }
 
             function showEditOption(e){
                 e.querySelector('.fee_details_main').style.opacity = "0.5";
@@ -301,12 +332,16 @@
 			    else if (event.target == mymodal_custom_add_fee) {
 			        mymodal_custom_add_fee.style.display = "none";
 			    }
+			    else if(event.target == mymodal_custom_student_discontinued){
+			        mymodal_custom_student_discontinued.style.display = "none";
+                }
 			}
 
 			$(document).keydown(function(event) {
 				if (event.keyCode == 27) {
 					$('#mymodal_custom_mark_att').hide();
 					$('#mymodal_custom_add_fee').hide();
+                    $('#mymodal_custom_student_discontinued').hide();
 				}
 			});
 		</script>

@@ -10,6 +10,9 @@ urlpatterns = [
     path('student/update/<int:pk>', views.StudentUpdateView.as_view(), name = 'student_update'),
     path('student/list/', views.StudentListView.as_view(), name = 'student_list'),
     path('student/<int:pk>/', views.StudentDetailView, name = 'student_detail'),
+    path('student/discontinue/', views.StudentDiscontinueFormView, name = 'student_discontinue'),
+    path('student/discontinue/mark/', views.StudentDiscontinueMarkView, name = 'student_discontinue_mark'),
+    path('student/facts/', views.StudentFactsView, name="student_facts"),
 
     path('attendance/new/', views.AttendanceCreateView, name = 'attendance_form'),
     path('attendance/mark/', views.AttendanceMarkView, name = 'mark_attendance'),

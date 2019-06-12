@@ -32,8 +32,9 @@
 		background-color: #2e3038;
 		box-shadow: none;
 	}
-	#main_container{
-		border-top: 1px solid black;
+	#main_heading{
+		border-bottom: 1px solid black;
+        width: 100%;
 		/*height: 70vh;*/
 	}
 	.row{
@@ -72,8 +73,19 @@
 		outline: none;
 		box-shadow: none;
 	}
+
+    .sticky{
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding-top: 10px;
+        background-color: white;
+    }
 </style>
-<h4 style="display: block; text-align: center;">Fee Payment</h4>
+    <div id="main_heading">
+        <h4 style="display: block; text-align: center;" >Fee Payment</h4>
+    </div>
+
 
 <div id="main_container">
 <br>
@@ -174,6 +186,18 @@
 		var url_string = window.location.href;
 		var url = new URL(url_string)
 		url_grade = url.searchParams.get('grade')
+        if(url_grade){
+			console.log(url_grade);
+			var grade = document.getElementById('class'+ url_grade);
+			var grade_students = document.getElementById('class_'+ url_grade + '_students');
+			var a = grade;
+			changeBack(a);
+		}
+		else{
+			var class9 = document.getElementById('class9');
+			class9.style.backgroundColor = "black";
+			class9.style.color = "white";
+		}
 
 		function changeBack(a) {
 			var class9 = document.getElementById('class9');
@@ -230,18 +254,7 @@
 				document.getElementById('date_paid').value = "";
 			}
 		});
-		if(url_grade){
-			console.log(url_grade);
-			var grade = document.getElementById('class'+ url_grade);
-			var grade_students = document.getElementById('class_'+ url_grade + '_students');
-			var a = grade;
-			changeBack(a);
-		}
-		else{
-			var class9 = document.getElementById('class9');
-			class9.style.backgroundColor = "black";
-			class9.style.color = "white";
-		}
+
 
 		function fill_today(){
 			document.getElementById('date_paid').value = '{{ today }}'
@@ -258,6 +271,13 @@
 		function fill_900(){
 			document.getElementById('amount').value = '900'
 		}
+		window.onscroll = function(){
+		    let main_heading = document.getElementById('main_heading');
+		    if(window.pageYOffset > main_heading.offsetTop)
+		        main_heading.classList.add('sticky')
+            else
+                 main_heading.classList.remove('sticky')
+        }
 
 	</script>
 	<br>

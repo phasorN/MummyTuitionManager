@@ -1,0 +1,335 @@
+{% extends 'main/base.html' %}
+{% load main_filters %}
+{% load bootstrap4 %}
+
+{% block title_block %}
+    <title>Select Discontinued Student</title>
+{% endblock %}
+
+{% block body_block %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style type="text/css">
+        .my_card_container {
+            padding: 10px;
+            width: 50%;
+        }
+
+        .my_card {
+            background-color: transparent;
+            border: 1px solid black;
+            display: inline-block !important;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            outline: none;
+            box-shadow: none;
+        }
+
+        .my_card:hover {
+            border: 2px solid black;
+            padding: 9px;
+            box-shadow: none;
+        }
+
+        .my_card:focus {
+            color: white;
+            background-color: #2e3038;
+            box-shadow: none;
+        }
+
+        #main_heading {
+            border-bottom: 1px solid black;
+            width: 100%;
+        }
+
+        .row {
+            margin: 0px !important;
+        }
+
+        table, input {
+            width: 100%;
+            padding: 5px !important;
+        }
+
+        input {
+            background-color: transparent;
+            border: 1px solid grey;
+            /*border-radius: 10px;*/
+            padding: 5px;
+        }
+
+        .msb, .mcb {
+            cursor: pointer;
+            width: 49%;
+        }
+
+        .msb:hover, .msb:focus {
+            background-color: #ff785d;
+            color: white;
+        }
+        .mcb:hover ,.mcb:focus{
+            background-color: #598054;
+            color: white;
+        }
+
+        .sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 10px;
+            background-color: white;
+        }
+        #loading_student_facts{
+            display: none;
+            text-align: center;
+        }
+        #date_input{
+            {#width: 48%;#}
+        }
+    </style>
+    <div id="main_heading">
+        <h4 style="display: block; text-align: center;">Student Discontinuation</h4>
+    </div>
+    <br>
+    <h5 style="display: block; text-align: center;">Select Class</h5>
+    <div class="row" style="padding: 0!important; margin: 0 auto!important;">
+        <div class="my_card_container">
+            <button class="my_card btn" id="class9" onclick="changeBack(this)" style="text-align: center;">Class 9
+            </button>
+        </div>
+        <div class="my_card_container">
+            <button class="my_card btn" id="class10" onclick="changeBack(this)" style="text-align: center;">Class 10
+            </button>
+        </div>
+    </div>
+    <br>
+
+    {% if students_class_9 or students_class_10 %}
+        <h5 style="margin-bottom: 20px; text-align: center;">Select Student</h5>
+    {% endif %}
+    <div id="class_9_students" class="row">
+        {% for sc9 in students_class_9 %}
+            <div class="my_card_container">
+                <button class="my_card btn"
+                        onclick="student_selected('{{ sc9.name }} ', '{{ sc9.pk }}')">{{ sc9.name }}</button>
+            </div>
+        {% empty %}
+            <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to
+                continue.</h5>
+        {% endfor %}
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+    <div id="class_10_students" class="row" style="display: none;">
+        {% for sc10 in students_class_10 %}
+            <div class="my_card_container">
+                <button class="my_card btn"
+                        onclick="student_selected('{{ sc10.name }} ', '{{ sc10.pk }}')">{{ sc10.name }}</button>
+            </div>
+        {% empty %}
+            <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to
+                continue.</h5>
+        {% endfor %}
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+
+    <!-- Modal -->
+    <div id="my_modal_student_discontinuation" class="modal_custom">
+		<div class="modal_custom-content" >
+            <h5>Confirm Discontinuation?</h5>
+            <div style="color: green; padding-left: 10px; border-left: 1px solid green;margin-bottom: 5px!important;">
+                <h5 id="name"></h5>
+                <h6 id="date_joined"></h6>
+                <h6 id="grade"></h6>
+                <h6 id="last_fee_date"></h6>
+
+                <div id="loading_student_facts">
+                    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="64px" height="64px" viewBox="0 0 128 128"
+                         xml:space="preserve">
+                        <g>
+                            <linearGradient id="linear-gradient">
+                                <stop offset="0%" stop-color="green"/>
+                                <stop offset="100%" stop-color="#fff"/>
+                            </linearGradient>
+                            <path
+                            d="M63.85 0A63.85 63.85 0 1 1 0 63.85 63.85 63.85 0 0 1 63.85 0zm.65 19.5a44 44 0 1 1-44 44 44 44 0 0 1 44-44z"
+                            fill="url(#linear-gradient)" fill-rule="evenodd"/>
+                            <animateTransform attributeName="transform" type="rotate" from="0 64 64" to="360 64 64" dur="1080ms" repeatCount="indefinite">
+
+                            </animateTransform>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div id="step_1_buttons">
+                <input type="button" class="msb" id="show_date_form" value="Yes">
+                <input type="button" class="mcb" value="No">
+            </div>
+            <form action="{% url 'main:student_discontinue_mark' %}" id="date_form" method="get" style="display: none;">
+                <label for="date" style="display: block; margin-bottom: 0;">Discontinued on: </label>
+                <input type="date" id="date_input" name="date" value="" max="{{ date }}">
+                <input type="hidden" id="pk_input" name="pk" value="">
+                <hr>
+                <input type="submit" class="msb" value="Confirm">
+                <input type="button" class="mcb" value="Cancel">
+            </form>
+        </div>
+    </div>
+
+    <style type="text/css">
+        .modal_custom {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal_custom-content {
+            background-color: white;
+            margin: 20% auto;
+            padding: 30px;
+            border: 1px solid #888;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        url_grade = url.searchParams.get('grade');
+        if (url_grade) {
+            console.log(url_grade);
+            var grade = document.getElementById('class' + url_grade);
+            var grade_students = document.getElementById('class_' + url_grade + '_students');
+            var a = grade;
+            changeBack(a);
+        } else {
+            var class9 = document.getElementById('class9');
+            class9.style.backgroundColor = "black";
+            class9.style.color = "white";
+        }
+
+        function changeBack(a) {
+            let class9 = document.getElementById('class9');
+            let class10 = document.getElementById('class10');
+            let class_9_students = document.getElementById('class_9_students');
+            let class_10_students = document.getElementById('class_10_students');
+
+            if (a.id == 'class9') {
+                if (class10.style.backgroundColor == "black") {
+                    class10.style.backgroundColor = "white";
+                    class10.style.color = "black";
+                }
+                class9.style.backgroundColor = "black";
+                class9.style.color = "white";
+                class_9_students.style.display = "flex";
+                class_10_students.style.display = "none";
+
+
+            } else if (a.id == 'class10') {
+                console.log(class9.style.backgroundColor)
+                if (class9.style.backgroundColor == "black") {
+                    class9.style.backgroundColor = "white";
+                    class9.style.color = "black";
+                }
+                class10.style.backgroundColor = "black";
+                class10.style.color = "white";
+                class_10_students.style.display = "flex";
+                class_9_students.style.display = "none";
+            }
+        }
+        let my_modal_student_discontinuation = document.getElementById('my_modal_student_discontinuation');
+
+        function student_selected(name, pk){
+            let wl = window.location;
+            var url = wl.protocol + "//" + wl.hostname + ":" + wl.port + "/student/facts/";
+
+            let grade = document.getElementById('grade');
+            let date_joined = document.getElementById('date_joined');
+            let last_fee_date = document.getElementById('last_fee_date');
+            let loading_student_facts = document.getElementById('loading_student_facts');
+            let pk_input = document.getElementById('pk_input');
+            let date_input = document.getElementById('date_input');
+
+            date_input.value = "dd-mm-yyyy";
+
+            pk_input.value = pk;
+
+            $.ajax({
+				url: url,
+				method: "GET",
+				dataType: "json",
+				data: `pk=${pk}`,
+				success: function (data){
+				    //console.log(data);
+                    loading_student_facts.style.display="none";
+
+                    grade.innerText = "Class: " + data.grade;
+                    date_joined.innerText = "Date Joined: " +  data.date_joined;
+                    if(data.last_fee_date){
+                        last_fee_date.innerText = " Last Fee Paid: " + data.last_fee_date;
+                    }
+                    else{
+                        last_fee_date.innerText = "Last Fee Paid: N/A";
+                    }
+
+
+                }
+            });
+
+            my_modal_student_discontinuation.style.display = "flex";
+            document.getElementById('date_form').style.display = "none";
+            document.getElementById('step_1_buttons').style.display = "block";
+
+            let stud_name = document.getElementById('name');
+            stud_name.innerText = name;
+            grade.innerText = "";
+            date_joined.innerText = "";
+            last_fee_date.innerText = "";
+            loading_student_facts.style.display="inline-block";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == my_modal_student_discontinuation) {
+                my_modal_student_discontinuation.style.display = "none";
+            }
+        };
+
+        $(document).keydown(function(event) {
+            if (event.keyCode === 27) {
+                $('#my_modal_student_discontinuation').hide();
+            }
+        });
+
+        window.onscroll = function () {
+            let main_heading = document.getElementById('main_heading');
+            if (window.pageYOffset > main_heading.offsetTop)
+                main_heading.classList.add('sticky');
+            else
+                main_heading.classList.remove('sticky');
+        };
+
+        document.getElementById('show_date_form').addEventListener('click', function (event) {
+            document.getElementById('date_form').style.display = "block";
+            document.getElementById('step_1_buttons').style.display = "none";
+        })
+
+        for( let x =0; x <  document.getElementsByClassName('mcb').length; x++){
+            document.getElementsByClassName('mcb')[x].addEventListener('click', function (event) {
+                my_modal_student_discontinuation.style.display = "none";
+            })
+        }
+    </script>
+{% endblock %}
