@@ -92,20 +92,20 @@
 	<h5 style="display: block; text-align: center;">Select Class</h5>
 	<div class="row" style="padding: 0!important; margin: 0 auto!important;">
 		<div class="my_card_container">
-			<button class="my_card btn" id="class9" onclick="changeBack(this)" style="text-align: center;">Class 9</button>
+			<button class="my_card btn" id="class10_1" onclick="changeBack(this)" style="text-align: center;">Class 10_1</button>
 		</div>
 		<div class="my_card_container">
 			<button class="my_card btn" id="class10" onclick="changeBack(this)" style="text-align: center;">Class 10</button>
 		</div>
 	</div>
 	<hr>
-	{% if students_class_9 or students_class_10%}
+	{% if students_class_10_1 or students_class_10%}
     	<h5 style="margin-bottom: 20px; text-align: center;">Select Student</h5>
     {% endif %}
-	<div id="class_9_students" class="row">
-		{% for sc9 in students_class_9 %}
+	<div id="class_10_1_students" class="row">
+		{% for sc10_1 in students_class_10_1 %}
 			<div class="my_card_container">
-				<button class="my_card btn" onclick="student_selected('{{ sc9.name}} ', '{{ sc9.pk }}')">{{ sc9.name }}</button>
+				<button class="my_card btn" onclick="student_selected('{{ sc10_1.name}} ', '{{ sc10_1.pk }}')">{{ sc10_1.name }}</button>
 			</div>
 		{% empty %}
             <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to continue.</h5>
@@ -146,8 +146,8 @@
 					<tr>
 						<td></td>
 						<td>
-						<button type="button" onclick="fill_800()" class="helptext">800?</button>
-						<button type="button" class="helptext" onclick="fill_900()">900?</button>
+						<button type="button" onclick="fill_900()" class="helptext">900?</button>
+						<button type="button" class="helptext" onclick="fill_1000()">1000?</button>
 						</td>
 					</tr>
 
@@ -194,39 +194,39 @@
 			changeBack(a);
 		}
 		else{
-			var class9 = document.getElementById('class9');
-			class9.style.backgroundColor = "black";
-			class9.style.color = "white";
+			var class10_1 = document.getElementById('class10_1');
+			class10_1.style.backgroundColor = "black";
+			class10_1.style.color = "white";
 		}
 
 		function changeBack(a) {
-			var class9 = document.getElementById('class9');
+			var class10_1 = document.getElementById('class10_1');
 			var class10 = document.getElementById('class10');
-			var class_9_students = document.getElementById('class_9_students');
+			var class_10_1_students = document.getElementById('class_10_1_students');
 			var class_10_students = document.getElementById('class_10_students');
 
-			if(a.id == 'class9'){
+			if(a.id == 'class10_1'){
 				if(class10.style.backgroundColor == "black"){
 					class10.style.backgroundColor = "white";
 					class10.style.color = "black";
 				}
-				class9.style.backgroundColor="black";
-				class9.style.color = "white";
-				class_9_students.style.display="flex";
+				class10_1.style.backgroundColor="black";
+				class10_1.style.color = "white";
+				class_10_1_students.style.display="flex";
 				class_10_students.style.display="none";
 
 
 			}
 			else if(a.id == 'class10'){
-				console.log(class9.style.backgroundColor)
-				if(class9.style.backgroundColor == "black"){
-					class9.style.backgroundColor = "white";
-					class9.style.color = "black";
+				console.log(class10_1.style.backgroundColor)
+				if(class10_1.style.backgroundColor == "black"){
+					class10_1.style.backgroundColor = "white";
+					class10_1.style.color = "black";
 				}
 				class10.style.backgroundColor="black";
 				class10.style.color = "white";
 				class_10_students.style.display="flex";
-				class_9_students.style.display="none";
+				class_10_1_students.style.display="none";
 			}
 		}
 
@@ -264,12 +264,12 @@
 			document.getElementById('date_paid').value = '{{ yesterday }}'
 		}
 
-		function fill_800(){
-			document.getElementById('amount').value = '800'
-		}
-
 		function fill_900(){
 			document.getElementById('amount').value = '900'
+		}
+
+		function fill_1000(){
+			document.getElementById('amount').value = '1000'
 		}
 		window.onscroll = function(){
 		    let main_heading = document.getElementById('main_heading');

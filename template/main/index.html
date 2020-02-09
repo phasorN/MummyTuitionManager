@@ -161,7 +161,7 @@
 			}
 		</style>
 	{% if user.is_authenticated %}
-		<h4 style="text-align: center;">Tution Management</h4>
+		<h4 style="text-align: center;">Tuition Management</h4>
 		<br>
 		<button class="custom_btn" onclick="mark_attendance()">
 			<span>Mark Today's Attendance</span>
@@ -218,9 +218,9 @@
 				<h5 style="text-align: center;">Mark Today's Attendance</h5>
 				<div class="row" style="padding: 0!important; margin: 0 auto!important;">
 					<div class="my_card_container">
-						<a class="att" href="/attendance/new/?date={{ date_today }}&class=9">
+						<a class="att" href="/attendance/new/?date={{ date_today }}&class=10.1">
 							<div class="my_card btn">
-								<h5 style="text-align: center;">Class 9</h5>
+								<h5 style="text-align: center;">Class 10.1</h5>
 							</div>
 						</a>
 					</div>
@@ -240,9 +240,9 @@
 				<h5 style="text-align: center;">Add Fee Payment Details</h5>
 				<div class="row" style="padding: 0!important; margin: 0 auto!important;">
 				<div class="my_card_container">
-					<a class="att" href="/fee/new/?grade=9">
+					<a class="att" href="/fee/new/?grade=10_1">
 						<div class="my_card btn">
-							<h5 style="text-align: center;">Class 9</h5>
+							<h5 style="text-align: center;">Class 10_1</h5>
 						</div>
 					</a>
 				</div>
@@ -262,9 +262,9 @@
 				<h5 style="text-align: center;">Add Discontinued Student</h5>
 				<div class="row" style="padding: 0!important; margin: 0 auto!important;">
 				<div class="my_card_container">
-					<a class="att" href="/student/discontinue/?grade=9">
+					<a class="att" href="/student/discontinue/?grade=10_1">
 						<div class="my_card btn">
-							<h5 style="text-align: center;">Class 9</h5>
+							<h5 style="text-align: center;">Class 10.1</h5>
 						</div>
 					</a>
 				</div>
@@ -353,7 +353,7 @@
 
 	{% else %}
 	<div class="jumbotron">
-		<h4>Tution Management</h4>
+		<h4>TuitionHelpDesk</h4>
 		<p>Welcome, stranger!</p>
 		<p>This is a simple webapp made to help manage the tuition classes for the tutors.</p>
 		<p>You need to be logged in to use the features! *grin*</p>

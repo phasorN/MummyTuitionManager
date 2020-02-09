@@ -94,7 +94,7 @@
     <h5 style="display: block; text-align: center;">Select Class</h5>
     <div class="row" style="padding: 0!important; margin: 0 auto!important;">
         <div class="my_card_container">
-            <button class="my_card btn" id="class9" onclick="changeBack(this)" style="text-align: center;">Class 9
+            <button class="my_card btn" id="class10_1" onclick="changeBack(this)" style="text-align: center;">Class 10_1
             </button>
         </div>
         <div class="my_card_container">
@@ -104,14 +104,14 @@
     </div>
     <br>
 
-    {% if students_class_9 or students_class_10 %}
+    {% if students_class_10_1 or students_class_10 %}
         <h5 style="margin-bottom: 20px; text-align: center;">Select Student</h5>
     {% endif %}
-    <div id="class_9_students" class="row">
-        {% for sc9 in students_class_9 %}
+    <div id="class_10_1_students" class="row">
+        {% for sc10_1 in students_class_10_1 %}
             <div class="my_card_container">
                 <button class="my_card btn"
-                        onclick="student_selected('{{ sc9.name }} ', '{{ sc9.pk }}')">{{ sc9.name }}</button>
+                        onclick="student_selected('{{ sc10_1.name }} ', '{{ sc10_1.pk }}')">{{ sc10_1.name }}</button>
             </div>
         {% empty %}
             <h5 style="text-align: center;">No students yet. <a href="{% url 'main:student_form' %}">Add</a> students to
@@ -216,38 +216,38 @@
             var a = grade;
             changeBack(a);
         } else {
-            var class9 = document.getElementById('class9');
-            class9.style.backgroundColor = "black";
-            class9.style.color = "white";
+            var class10_1 = document.getElementById('class10_1');
+            class10_1.style.backgroundColor = "black";
+            class10_1.style.color = "white";
         }
 
         function changeBack(a) {
-            let class9 = document.getElementById('class9');
+            let class10_1 = document.getElementById('class10_1');
             let class10 = document.getElementById('class10');
-            let class_9_students = document.getElementById('class_9_students');
+            let class_10_1_students = document.getElementById('class_10_1_students');
             let class_10_students = document.getElementById('class_10_students');
 
-            if (a.id == 'class9') {
+            if (a.id == 'class10_1') {
                 if (class10.style.backgroundColor == "black") {
                     class10.style.backgroundColor = "white";
                     class10.style.color = "black";
                 }
-                class9.style.backgroundColor = "black";
-                class9.style.color = "white";
-                class_9_students.style.display = "flex";
+                class10_1.style.backgroundColor = "black";
+                class10_1.style.color = "white";
+                class_10_1_students.style.display = "flex";
                 class_10_students.style.display = "none";
 
 
             } else if (a.id == 'class10') {
-                console.log(class9.style.backgroundColor)
-                if (class9.style.backgroundColor == "black") {
-                    class9.style.backgroundColor = "white";
-                    class9.style.color = "black";
+                console.log(class10_1.style.backgroundColor)
+                if (class10_1.style.backgroundColor == "black") {
+                    class10_1.style.backgroundColor = "white";
+                    class10_1.style.color = "black";
                 }
                 class10.style.backgroundColor = "black";
                 class10.style.color = "white";
                 class_10_students.style.display = "flex";
-                class_9_students.style.display = "none";
+                class_10_1_students.style.display = "none";
             }
         }
         let my_modal_student_discontinuation = document.getElementById('my_modal_student_discontinuation');

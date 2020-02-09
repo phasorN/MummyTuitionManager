@@ -17,7 +17,8 @@ def Index(request):
         return render(request, "main/index.html",{})
 
     # If user is logged in.
-    recent_fee_payments = Fee.objects.filter(tutor=request.user).order_by('-added_on')[:3]
+    # Show list of only those students who are active
+    recent_fee_payments = Fee.objects.filter(tutor=request.user, student__active=True).order_by('-added_on')[:3]
     today = dt.datetime.now().date().strftime('%Y-%m-%d')
 
     return render(request, "main/index.html", {'date_today': today, 'recent_fee_payments': recent_fee_payments})
@@ -54,9 +55,9 @@ class StudentUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        date_f = dt.datetime.strptime('01-05-2018', "%d-%m-%Y")
+        # date_f = dt.datetime.strptime('01-05-2018', "%d-%m-%Y")
         # date = dt.datetime(date_f)
-        initial.update({ 'date_joined': date_f })
+        # initial.update({ 'date_joined': date_f })
         return initial
 
 class StudentListView(LoginRequiredMixin, ListView):
@@ -64,7 +65,7 @@ class StudentListView(LoginRequiredMixin, ListView):
     template_name = "main/student_list.html"
 
     def get_queryset(self):
-        return Student.objects.filter(tutor=self.request.user).order_by('grade', 'left')
+        return Student.objects.filter(active=True, tutor=self.request.user).order_by('grade', 'left')
 
 @login_required
 def StudentDetailView(request, pk):
@@ -84,15 +85,15 @@ def StudentDetailView(request, pk):
 @login_required
 def StudentDiscontinueFormView(request):
     date = dt.datetime.now().date().strftime('%Y-%m-%d')
-    students_class_9 = Student.objects.filter(tutor=request.user, grade=9, left=False)
-    students_class_10 = Student.objects.filter(tutor=request.user, grade=10, left=False)
-    return render(request, "main/student_discontinue_form.html", {'students_class_9':students_class_9, 'students_class_10':students_class_10, 'date': date})
+    students_class_10_1 = Student.objects.filter(active=True, tutor=request.user, grade=10.1, left=False)
+    students_class_10 = Student.objects.filter(active=True, tutor=request.user, grade=10, left=False)
+    return render(request, "main/student_discontinue_form.html", {'students_class_10_1':students_class_10_1, 'students_class_10':students_class_10, 'date': date})
 
 @login_required
 def StudentFactsView(request):
     if 'pk' in request.GET:
         pk = request.GET.get('pk')
-        student = Student.objects.filter(pk=pk)
+        student = Student.objects.filter(active=True, pk=pk)
         if student.count() == 1:
             student = student.first()
             if student.tutor == request.user:
@@ -116,7 +117,7 @@ def StudentDiscontinueMarkView(request):
         pk = request.GET.get('pk')
         date = request.GET.get('date')
         if pk and date:
-            student = Student.objects.filter(pk=pk)
+            student = Student.objects.filter(active=True, pk=pk)
             if student.count() == 1:
                 student = student.first()
                 if student.tutor == request.user:
@@ -158,7 +159,7 @@ def AttendanceCreateView(request):
             context = {'date':date, 'error': 'Adding future attendances is not allowed.'}
             return render(request, "main/date_class_form.html", context)
 
-        students = Student.objects.filter(tutor=request.user, grade=grade, left=False, date_joined__lte=date)
+        students = Student.objects.filter(active=True, tutor=request.user, grade=grade, left=False, date_joined__lte=date)
 
         noStudentsYet = False
 
@@ -246,7 +247,7 @@ def AttendanceMarkHolidayView(request):
         date = request.GET.get('date')
         date = dt.datetime.strptime(date, '%Y-%m-%d').date()
 
-        students = Student.objects.filter(tutor=request.user, grade=grade, left=False, date_joined__lte=date)
+        students = Student.objects.filter(active=True, tutor=request.user, grade=grade, left=False, date_joined__lte=date)
 
         for student in students:
             if Attendance.objects.filter(student=student, tutor=request.user, date=date).exists():
@@ -266,7 +267,7 @@ def AttendanceMarkNotHolidayView(request):
         date = request.GET.get('date')
         date = dt.datetime.strptime(date, '%Y-%m-%d').date()
 
-        students = Student.objects.filter(tutor=request.user, grade=grade, left=False, date_joined__lte=date)
+        students = Student.objects.filter(active=True, tutor=request.user, grade=grade, left=False, date_joined__lte=date)
 
         for student in students:
             if Attendance.objects.filter(student=student, tutor=request.user, date=date).exists():
@@ -306,12 +307,14 @@ def AttendanceChangeView(request):
 @login_required
 def FeeCreateView(request):
     if request.method == "GET":
-
         today = dt.datetime.now().date().strftime("%Y-%m-%d")
         yesterday = (dt.datetime.now().date() - timedelta(1)).strftime("%Y-%m-%d")
-        students_class_9 = Student.objects.filter(tutor=request.user, grade=9, left=False)
-        students_class_10 = Student.objects.filter(tutor=request.user, grade=10, left=False)
-        return render(request, "main/fee_form.html", {'students_class_9':students_class_9, 'students_class_10':students_class_10, 'today': today, 'yesterday': yesterday})
+        students_class_10_1 = Student.objects.filter(active=True, tutor=request.user, grade=10.1, left=False)
+        students_class_10 = Student.objects.filter(active=True, tutor=request.user, grade=10, left=False)
+        return render(request, "main/fee_form.html", {'students_class_10_1': students_class_10_1,
+                                                      'students_class_10': students_class_10,
+                                                      'today': today,
+                                                      'yesterday': yesterday})
 
     elif request.method == "POST":
 
@@ -327,8 +330,8 @@ def FeeCreateView(request):
             else:
                 today = dt.datetime.now().date().strftime("%Y-%m-%d")
                 yesterday = (dt.datetime.now().date() - timedelta(1)).strftime("%Y-%m-%d")
-                students_class_9 = Student.objects.filter(tutor=request.user, grade=9, left=False)
-                students_class_10 = Student.objects.filter(tutor=request.user, grade=10, left=False)
+                students_class_9 = Student.objects.filter(active=True, tutor=request.user, grade=9, left=False)
+                students_class_10 = Student.objects.filter(active=True, tutor=request.user, grade=10, left=False)
                 error = "You already added that '" + student.name + " paid Rs " + amount + " on " + date_paid + ".'"
                 return render(request, "main/fee_details_duplicate.html", {'error_part1': error, 'error_part2':  'Do you want to add again?', 'date_paid': date_paid, 'amount':amount, 'pk': pk})
         else:
@@ -338,12 +341,14 @@ def FeeCreateView(request):
 
         return HttpResponseRedirect(reverse('main:index') + "?hover_id=" + str(fee.pk))
 
+
 class FeeListView(LoginRequiredMixin, ListView):
     model = Fee
     template_name = "main/fee_list.html"
 
     def get_queryset(self):
-        return Fee.objects.filter(tutor=self.request.user).order_by('-added_on')
+        # Show list of only those students who are active
+        return Fee.objects.filter(tutor=self.request.user, student__active=True).order_by('-added_on')
     def get_context_data(self, ** kwargs):
         context = super().get_context_data( ** kwargs)
         today = dt.datetime.now().date().strftime("%Y-%m-%d")
@@ -351,6 +356,7 @@ class FeeListView(LoginRequiredMixin, ListView):
         context.update({'today': today, 'yesterday': yesterday})
         print(context)
         return context
+
 
 @login_required
 def FeeUpdateView(request):
