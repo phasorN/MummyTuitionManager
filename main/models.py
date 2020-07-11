@@ -8,7 +8,7 @@ class Student(models.Model):
 	tutor = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
 	name = models.CharField(max_length=200)
 	email = models.EmailField(max_length=100, null=False)
-	grade = models.FloatField()
+	grade = models.IntegerField()
 	date_joined = models.DateField(null=True)
 	left = models.BooleanField(null=False, default=False)
 	date_left = models.DateField(null=True)

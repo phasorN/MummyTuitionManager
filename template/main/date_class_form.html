@@ -45,10 +45,10 @@
 
 		<div class="form-group row">
 			<label class="col-2 form-label mx-auto" for="class">Class:</label> 
-			<input id="class10_1" class="col-5 form-control classButton" type="button" value="10.1" onclick="changeBack(this)">
+			<input id="class9" class="col-5 form-control classButton" type="button" value="9" onclick="changeBack(this)">
 			<input id="class10" class="col-5 form-control classButton" type="button" value="10" onclick="changeBack(this)">
 
-			<input id="classInput" type="hidden" name="class" value="10.1">
+			<input id="classInput" type="hidden" name="class" value="9">
 		</div>
 
 		<div class="form-group row">
@@ -57,27 +57,27 @@
 
 	</form>
 	<script type="text/javascript">
-		var class10_1 = document.getElementById('class10_1');
-		// class10_1.style.backgroundColor = "grey";
-		class10_1.style.color = "black";
-		class10_1.style.border = "2px solid black";
+		var class9 = document.getElementById('class9');
+		// class9.style.backgroundColor = "grey";
+		class9.style.color = "black";
+		class9.style.border = "2px solid black";
 
 		function changeBack(a) {
-			var class10_1 = document.getElementById('class10_1');
+			var class9 = document.getElementById('class9');
 			var class10 = document.getElementById('class10');
 			var classInput = document.getElementById('classInput');
 
-			if(a.id == 'class10_1'){
+			if(a.id == 'class9'){
 				if(class10.style.border == "2px solid black"){
 					class10.style.border = "1px solid grey";
 				}
-				class10_1.style.border = "2px solid black";
-				classInput.value = "10.1";
+				class9.style.border = "2px solid black";
+				classInput.value = "9";
 
 			}
 			else if(a.id == 'class10'){
-				if(class10_1.style.border == "2px solid black"){
-					class10_1.style.border = "1px solid grey";
+				if(class9.style.border == "2px solid black"){
+					class9.style.border = "1px solid grey";
 				}
 				class10.style.border = "2px solid black";
 				classInput.value = "10";

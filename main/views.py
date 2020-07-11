@@ -86,9 +86,9 @@ def StudentDetailView(request, pk):
 @login_required
 def StudentDiscontinueFormView(request):
     date = dt.datetime.now().date().strftime('%Y-%m-%d')
-    students_class_10_1 = Student.objects.filter(active=True, tutor=request.user, grade=10.1, left=False)
+    students_class_9 = Student.objects.filter(active=True, tutor=request.user, grade=9, left=False)
     students_class_10 = Student.objects.filter(active=True, tutor=request.user, grade=10, left=False)
-    return render(request, "main/student_discontinue_form.html", {'students_class_10_1':students_class_10_1, 'students_class_10':students_class_10, 'date': date})
+    return render(request, "main/student_discontinue_form.html", {'students_class_9':students_class_9, 'students_class_10':students_class_10, 'date': date})
 
 @login_required
 def StudentFactsView(request):
@@ -310,9 +310,9 @@ def FeeCreateView(request):
     if request.method == "GET":
         today = dt.datetime.now().date().strftime("%Y-%m-%d")
         yesterday = (dt.datetime.now().date() - timedelta(1)).strftime("%Y-%m-%d")
-        students_class_10_1 = Student.objects.filter(active=True, tutor=request.user, grade=10.1, left=False)
+        students_class_9 = Student.objects.filter(active=True, tutor=request.user, grade=9, left=False)
         students_class_10 = Student.objects.filter(active=True, tutor=request.user, grade=10, left=False)
-        return render(request, "main/fee_form.html", {'students_class_10_1': students_class_10_1,
+        return render(request, "main/fee_form.html", {'students_class_9': students_class_9,
                                                       'students_class_10': students_class_10,
                                                       'today': today,
                                                       'yesterday': yesterday})
