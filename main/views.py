@@ -42,6 +42,7 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
         initial.update({ 'date_joined': date_f })
         return initial
 
+
 class StudentUpdateView(LoginRequiredMixin, UpdateView):
     model = Student
     template_name = "main/student_form.html"
